@@ -18,8 +18,22 @@
   h1{font-family:'Fredoka',sans-serif; color:var(--cherry-dark); font-size:1.6rem; margin-bottom:20px;}
   h2{font-family:'Fredoka',sans-serif; color:var(--sea); font-size:1.1rem; margin:28px 0 12px;}
   .card{background:var(--white); border-radius:16px; padding:20px; box-shadow:0 8px 20px rgba(59,42,32,0.08); margin-bottom:20px;}
-  .cart-line{display:flex; justify-content:space-between; padding:8px 0; border-bottom:1px solid #F0E4D3; font-size:0.95rem;}
+  .cart-line{display:flex; justify-content:space-between; align-items:center; padding:8px 0; border-bottom:1px solid #F0E4D3; font-size:0.95rem; gap:10px;}
   .cart-line:last-child{border-bottom:none;}
+  .cart-line-name{flex:1;}
+  .cart-line-right{display:flex; align-items:center; gap:10px;}
+  .qty-controls{display:flex; align-items:center; gap:6px;}
+  .qty-btn{
+    width:24px; height:24px; border-radius:50%; border:2px solid #EAD9C4; background:var(--cream);
+    color:var(--cocoa); font-weight:800; font-size:0.9rem; cursor:pointer; line-height:1; padding:0;
+  }
+  .qty-btn:hover{background:#EAD9C4;}
+  .qty-num{min-width:16px; text-align:center; font-weight:700;}
+  .remove-btn{
+    background:none; border:none; color:var(--cherry); font-weight:800; font-size:1.1rem; cursor:pointer;
+    padding:0 2px; line-height:1;
+  }
+  .remove-btn:hover{color:var(--cherry-dark);}
   .totals-row{display:flex; justify-content:space-between; padding:6px 0; font-weight:700;}
   .totals-row.grand{font-size:1.15rem; color:var(--cherry-dark); border-top:2px dashed #EAD9C4; margin-top:8px; padding-top:12px;}
   label{display:block; font-weight:700; font-size:0.88rem; margin:14px 0 6px;}
@@ -136,10 +150,33 @@ function getCart() {
 
 function eur(n) { return '€' + Number(n).toFixed(2); }
 
-const cart = getCart();
+let cart = getCart();
 let selectedTip = 0;
 let lastValidatedAddress = null;
 let addressConfirmed = false;
+
+function persistCart() {
+  localStorage.setItem('sc_cart', JSON.stringify(cart));
+}
+
+function changeQty(id, delta) {
+  const item = cart.find(i => i.id === id);
+  if (!item) return;
+  item.qty += delta;
+  if (item.qty <= 0) {
+    cart = cart.filter(i => i.id !== id);
+  }
+  persistCart();
+  resetAddressConfirmation();
+  renderCart();
+}
+
+function removeItem(id) {
+  cart = cart.filter(i => i.id !== id);
+  persistCart();
+  resetAddressConfirmation();
+  renderCart();
+}
 
 function renderCart() {
   const linesEl = document.getElementById('cartLines');
@@ -148,9 +185,22 @@ function renderCart() {
     document.getElementById('checkoutContent').style.display = 'none';
     return;
   }
-  linesEl.innerHTML = cart.map(item =>
-    `<div class="cart-line"><span>${item.qty} × ${item.name}</span><span>${eur(item.unitPrice * item.qty)}</span></div>`
-  ).join('');
+  document.getElementById('emptyCartMsg').style.display = 'none';
+  document.getElementById('checkoutContent').style.display = 'block';
+  linesEl.innerHTML = cart.map(item => `
+    <div class="cart-line">
+      <span class="cart-line-name">${item.name}</span>
+      <div class="cart-line-right">
+        <div class="qty-controls">
+          <button type="button" class="qty-btn" onclick="changeQty('${item.id}', -1)" aria-label="Decrease quantity">−</button>
+          <span class="qty-num">${item.qty}</span>
+          <button type="button" class="qty-btn" onclick="changeQty('${item.id}', 1)" aria-label="Increase quantity">+</button>
+        </div>
+        <span>${eur(item.unitPrice * item.qty)}</span>
+        <button type="button" class="remove-btn" onclick="removeItem('${item.id}')" aria-label="Remove item" title="Remove">✕</button>
+      </div>
+    </div>
+  `).join('');
   updateTotalsPreview();
 }
 
