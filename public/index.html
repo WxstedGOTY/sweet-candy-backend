@@ -133,6 +133,21 @@
 
   .catalog-wrap{max-width:1000px; margin:0 auto;}
   .catalog-intro{text-align:center; max-width:600px; margin:0 auto 40px;}
+  .catalog-cats{display:flex; justify-content:center; flex-wrap:wrap; gap:10px; max-width:820px; margin:0 auto 36px;}
+  .catalog-cat-btn{
+    background:var(--white); border:2px solid var(--gold); border-radius:999px; padding:11px 20px;
+    font-weight:800; font-size:0.92rem; cursor:pointer; color:var(--cocoa); display:inline-flex; align-items:center; gap:8px;
+    transition:background 0.15s ease, color 0.15s ease, transform 0.15s ease, border-color 0.15s ease;
+    box-shadow:0 4px 12px rgba(59,42,32,0.06);
+  }
+  .catalog-cat-btn .cat-emoji{font-size:1.05rem;}
+  .catalog-cat-btn:hover{transform:translateY(-2px); border-color:var(--cherry);}
+  .catalog-cat-btn.active{background:var(--cherry); border-color:var(--cherry); color:var(--white); box-shadow:0 8px 18px rgba(195,49,73,0.28);}
+  .catalog-group-title{
+    font-family:'Fredoka', sans-serif; color:var(--sea-dark); font-size:1.05rem; font-weight:600;
+    margin:26px 0 12px; padding-bottom:8px; border-bottom:2px dashed #EAD9C4; grid-column:1 / -1;
+  }
+  .catalog-group-title:first-of-type{margin-top:0;}
   .menu-grid{display:grid; grid-template-columns:1fr 1fr; gap:28px;}
   .menu-card{
     background:var(--white); border-radius:22px; padding:26px 24px; box-shadow:0 10px 26px rgba(59,42,32,0.08);
@@ -307,6 +322,7 @@
         <span class="section-label" data-i18n="catalog_label">Menu</span>
         <h2 data-i18n="catalog_h2">Our full price list.</h2>
       </div>
+      <div class="catalog-cats" id="catalogCats"></div>
       <div class="menu-grid" id="menuGrid"></div>
     </div>
   </section>
@@ -712,21 +728,47 @@ const prices = {
   madagascar_bianca:2.45, lemon_sorbet:2.45, mango_sorbet:2.45, tiramisu:2.45, choco_brownies:2.45
 };
 
+const catalogTopCats = [
+  {key:"healthy", icon:"🥗", labelKey:"cat_top_healthy"},
+  {key:"normal", icon:"🥪", labelKey:"cat_top_normal"},
+  {key:"waffles", icon:"🧇", labelKey:"cat_top_waffles"},
+  {key:"crepes", icon:"🥞", labelKey:"cat_top_crepes"},
+  {key:"drinks", icon:"☕", labelKey:"cat_top_drinks"},
+  {key:"icecream", icon:"🍨", labelKey:"cat_top_icecream"}
+];
+
+let activeCatalogCat = safeGet('sc_catalog_cat') || 'healthy';
+
 const menuStructure = [
-  {icon:"🥙", key:"cat_base", accent:"cherry", items:["savory_crepe","sandwich_base"]},
-  {icon:"🧀", key:"cat_fillings", accent:"gold", items:["edam","edam_grated","philadelphia","feta","ham","turkey","bacon","salami","frank_sausage","country_sausage","oregano_sausage","breaded_chicken","beef_pork_patty","chicken_breast"]},
-  {icon:"🥬", key:"cat_veg", accent:"gold", items:["tomato","green_pepper","mushrooms","onion","lettuce","corn","olives","boiled_egg","omelette","cheese_croquettes"]},
-  {icon:"🥫", key:"cat_sauces", accent:"gold", items:["tzatziki","bbq","pink_sauce","yellow_sauce","mayo","hungarian","spicy_cheese","mustard","ketchup"]},
-  {icon:"⭐", key:"cat_pita", accent:"cherry", items:["pita_special"], note:"pita_note"},
-  {icon:"🍫", key:"cat_sweet_crepe", accent:"sea", items:["sweet_crepe","praline","white_choc","banana","walnut","coconut","almond","biscuit","oreo_biscuit","filled_biscuit","strawberry_jam","caprice"]},
-  {icon:"🧇", key:"cat_pancake_waffle", accent:"sea", items:["pancakes","waffle"]},
-  {icon:"☕", key:"cat_coffee_menu", accent:"gold", items:["espresso_single","espresso_double","cappuccino","freddo_espresso","freddo_cappuccino","americano"]},
-  {icon:"🍨", key:"cat_ice_cream", accent:"cherry", items:["chocolate","madagascar_vanilla","strawberry","vanilla_parfait","stracciatella","cookie_oreo","salted_caramel","triple_choc","ferrero","bueno","aegina_pistachio","kunefe","banoffee","cheesecake_amarena","red_velvet","yogurt_nuts_berries","dubai_choc","lotus","apple_strudel","madagascar_bianca","lemon_sorbet","mango_sorbet","tiramisu","choco_brownies"], note:"scoop_note"}
+  {topCategory:"healthy", icon:"🥗", key:"cat_healthy_group", accent:"sea",
+    items:["feta","turkey","chicken_breast","tomato","green_pepper","mushrooms","onion","lettuce","corn","olives","boiled_egg","tzatziki"]},
+
+  {topCategory:"normal", icon:"🥙", key:"cat_base", accent:"cherry", items:["savory_crepe","sandwich_base","pita_special"], note:"pita_note"},
+  {topCategory:"normal", icon:"🧀", key:"cat_fillings", accent:"gold",
+    items:["edam","edam_grated","philadelphia","ham","bacon","salami","frank_sausage","country_sausage","oregano_sausage","breaded_chicken","beef_pork_patty","omelette","cheese_croquettes"]},
+  {topCategory:"normal", icon:"🥫", key:"cat_sauces", accent:"gold",
+    items:["bbq","pink_sauce","yellow_sauce","mayo","hungarian","spicy_cheese","mustard","ketchup"]},
+
+  {topCategory:"waffles", icon:"🧇", key:"cat_pancake_waffle", accent:"sea", items:["waffle","pancakes"]},
+  {topCategory:"waffles", icon:"🍫", key:"cat_toppings", accent:"sea",
+    items:["praline","white_choc","banana","walnut","coconut","almond","biscuit","oreo_biscuit","filled_biscuit","strawberry_jam","caprice"]},
+
+  {topCategory:"crepes", icon:"🥞", key:"cat_crepe_base", accent:"sea", items:["sweet_crepe"]},
+  {topCategory:"crepes", icon:"🍫", key:"cat_toppings", accent:"sea",
+    items:["praline","white_choc","banana","walnut","coconut","almond","biscuit","oreo_biscuit","filled_biscuit","strawberry_jam","caprice"]},
+
+  {topCategory:"drinks", icon:"☕", key:"cat_coffee_menu", accent:"gold",
+    items:["espresso_single","espresso_double","cappuccino","freddo_espresso","freddo_cappuccino","americano"]},
+
+  {topCategory:"icecream", icon:"🍨", key:"cat_ice_cream", accent:"cherry",
+    items:["chocolate","madagascar_vanilla","strawberry","vanilla_parfait","stracciatella","cookie_oreo","salted_caramel","triple_choc","ferrero","bueno","aegina_pistachio","kunefe","banoffee","cheesecake_amarena","red_velvet","yogurt_nuts_berries","dubai_choc","lotus","apple_strudel","madagascar_bianca","lemon_sorbet","mango_sorbet","tiramisu","choco_brownies"], note:"scoop_note"}
 ];
 
 const menuText = {
   en:{ cat_base:"To Start", cat_fillings:"Fillings", cat_veg:"Vegetables", cat_sauces:"Sauces", cat_pita:"Pita Special", cat_sweet_crepe:"Sweet Crepe", cat_pancake_waffle:"Pancakes &amp; Waffles", cat_ice_cream:"Ice Cream",
     cat_coffee_menu:"Coffee",
+    cat_top_healthy:"Healthy", cat_top_normal:"Classics", cat_top_waffles:"Waffles", cat_top_crepes:"Crepes", cat_top_drinks:"Drinks", cat_top_icecream:"Ice Cream",
+    cat_healthy_group:"Fresh &amp; Light", cat_toppings:"Toppings", cat_crepe_base:"Crepe (base)",
     espresso_single:"Single Espresso", espresso_double:"Double Espresso", cappuccino:"Cappuccino", freddo_espresso:"Freddo Espresso", freddo_cappuccino:"Freddo Cappuccino", americano:"Americano",
     pita_note:"Pork strips, tomato, onion, fries, lettuce, tzatziki.", scoop_note:"Price per scoop.",
     savory_crepe:"Savory Crepe (base)", sandwich_base:"Sandwich (base)",
@@ -744,6 +786,8 @@ const menuText = {
   },
   fr:{ cat_base:"Pour Commencer", cat_fillings:"Garnitures", cat_veg:"Légumes", cat_sauces:"Sauces", cat_pita:"Pita Spécial", cat_sweet_crepe:"Crêpe Sucrée", cat_pancake_waffle:"Pancakes &amp; Gaufres", cat_ice_cream:"Glaces",
     cat_coffee_menu:"Café",
+    cat_top_healthy:"Sain", cat_top_normal:"Classiques", cat_top_waffles:"Gaufres", cat_top_crepes:"Crêpes", cat_top_drinks:"Boissons", cat_top_icecream:"Glaces",
+    cat_healthy_group:"Frais &amp; Léger", cat_toppings:"Garnitures", cat_crepe_base:"Crêpe (base)",
     espresso_single:"Espresso simple", espresso_double:"Espresso double", cappuccino:"Cappuccino", freddo_espresso:"Freddo Espresso", freddo_cappuccino:"Freddo Cappuccino", americano:"Americano",
     pita_note:"Lanières de porc, tomate, oignon, frites, laitue, tzatziki.", scoop_note:"Prix par boule.",
     savory_crepe:"Crêpe Salée (base)", sandwich_base:"Sandwich (base)",
@@ -761,6 +805,8 @@ const menuText = {
   },
   el:{ cat_base:"Βάση", cat_fillings:"Γέμιση", cat_veg:"Λαχανικά", cat_sauces:"Σος", cat_pita:"Πίτα Σπέσιαλ", cat_sweet_crepe:"Κρέπα Γλυκιά", cat_pancake_waffle:"Pancakes &amp; Βάφλα", cat_ice_cream:"Παγωτό",
     cat_coffee_menu:"Καφές",
+    cat_top_healthy:"Υγιεινά", cat_top_normal:"Κλασικά", cat_top_waffles:"Βάφλες", cat_top_crepes:"Κρέπες", cat_top_drinks:"Ροφήματα", cat_top_icecream:"Παγωτό",
+    cat_healthy_group:"Φρέσκο &amp; Ελαφρύ", cat_toppings:"Γαρνιτούρες", cat_crepe_base:"Κρέπα (βάση)",
     espresso_single:"Espresso μόνος", espresso_double:"Espresso διπλός", cappuccino:"Καπουτσίνο", freddo_espresso:"Freddo Espresso", freddo_cappuccino:"Freddo Cappuccino", americano:"Αμερικάνο",
     pita_note:"Πανσετάκι χοιρινό, ντομάτα, κρεμμύδι, πατάτες, μαρούλι, τζατζίκι.", scoop_note:"Τιμή ανά μπάλα.",
     savory_crepe:"Κρέπα Αλμυρή (βάση)", sandwich_base:"Σάντουιτς (βάση)",
@@ -778,6 +824,8 @@ const menuText = {
   },
   de:{ cat_base:"Basis", cat_fillings:"Füllungen", cat_veg:"Gemüse", cat_sauces:"Saucen", cat_pita:"Pita Spezial", cat_sweet_crepe:"Süße Crêpe", cat_pancake_waffle:"Pancakes &amp; Waffeln", cat_ice_cream:"Eis",
     cat_coffee_menu:"Kaffee",
+    cat_top_healthy:"Gesund", cat_top_normal:"Klassiker", cat_top_waffles:"Waffeln", cat_top_crepes:"Crêpes", cat_top_drinks:"Getränke", cat_top_icecream:"Eis",
+    cat_healthy_group:"Frisch &amp; Leicht", cat_toppings:"Beläge", cat_crepe_base:"Crêpe (Basis)",
     espresso_single:"Espresso einfach", espresso_double:"Espresso doppelt", cappuccino:"Cappuccino", freddo_espresso:"Freddo Espresso", freddo_cappuccino:"Freddo Cappuccino", americano:"Americano",
     pita_note:"Schweinestreifen, Tomate, Zwiebel, Pommes, Salat, Tzatziki.", scoop_note:"Preis pro Kugel.",
     savory_crepe:"Herzhafte Crêpe (Basis)", sandwich_base:"Sandwich (Basis)",
@@ -795,6 +843,8 @@ const menuText = {
   },
   it:{ cat_base:"Base", cat_fillings:"Ripieni", cat_veg:"Verdure", cat_sauces:"Salse", cat_pita:"Pita Speciale", cat_sweet_crepe:"Crêpe Dolce", cat_pancake_waffle:"Pancake &amp; Waffel", cat_ice_cream:"Gelato",
     cat_coffee_menu:"Caffè",
+    cat_top_healthy:"Salutare", cat_top_normal:"Classici", cat_top_waffles:"Waffel", cat_top_crepes:"Crêpe", cat_top_drinks:"Bevande", cat_top_icecream:"Gelato",
+    cat_healthy_group:"Fresco &amp; Leggero", cat_toppings:"Farciture", cat_crepe_base:"Crêpe (base)",
     espresso_single:"Espresso singolo", espresso_double:"Espresso doppio", cappuccino:"Cappuccino", freddo_espresso:"Freddo Espresso", freddo_cappuccino:"Freddo Cappuccino", americano:"Americano",
     pita_note:"Strisce di maiale, pomodoro, cipolla, patatine, lattuga, tzatziki.", scoop_note:"Prezzo a pallina.",
     savory_crepe:"Crêpe Salata (base)", sandwich_base:"Panino (base)",
@@ -812,6 +862,8 @@ const menuText = {
   },
   es:{ cat_base:"Base", cat_fillings:"Rellenos", cat_veg:"Verduras", cat_sauces:"Salsas", cat_pita:"Pita Especial", cat_sweet_crepe:"Crepe Dulce", cat_pancake_waffle:"Pancakes &amp; Gofres", cat_ice_cream:"Helado",
     cat_coffee_menu:"Café",
+    cat_top_healthy:"Saludable", cat_top_normal:"Clásicos", cat_top_waffles:"Gofres", cat_top_crepes:"Crepes", cat_top_drinks:"Bebidas", cat_top_icecream:"Helado",
+    cat_healthy_group:"Fresco &amp; Ligero", cat_toppings:"Coberturas", cat_crepe_base:"Crepe (base)",
     espresso_single:"Espresso solo", espresso_double:"Espresso doble", cappuccino:"Capuchino", freddo_espresso:"Freddo Espresso", freddo_cappuccino:"Freddo Cappuccino", americano:"Americano",
     pita_note:"Tiras de cerdo, tomate, cebolla, patatas fritas, lechuga, tzatziki.", scoop_note:"Precio por bola.",
     savory_crepe:"Crepe Salado (base)", sandwich_base:"Sándwich (base)",
@@ -829,6 +881,8 @@ const menuText = {
   },
   pl:{ cat_base:"Podstawa", cat_fillings:"Dodatki", cat_veg:"Warzywa", cat_sauces:"Sosy", cat_pita:"Pita Specjalna", cat_sweet_crepe:"Naleśnik Słodki", cat_pancake_waffle:"Pancakes &amp; Gofry", cat_ice_cream:"Lody",
     cat_coffee_menu:"Kawa",
+    cat_top_healthy:"Zdrowe", cat_top_normal:"Klasyki", cat_top_waffles:"Gofry", cat_top_crepes:"Naleśniki", cat_top_drinks:"Napoje", cat_top_icecream:"Lody",
+    cat_healthy_group:"Świeże &amp; Lekkie", cat_toppings:"Dodatki", cat_crepe_base:"Naleśnik (baza)",
     espresso_single:"Espresso pojedyncze", espresso_double:"Espresso podwójne", cappuccino:"Cappuccino", freddo_espresso:"Freddo Espresso", freddo_cappuccino:"Freddo Cappuccino", americano:"Americano",
     pita_note:"Paski wieprzowiny, pomidor, cebula, frytki, sałata, tzatziki.", scoop_note:"Cena za gałkę.",
     savory_crepe:"Naleśnik Wytrawny (podstawa)", sandwich_base:"Kanapka (podstawa)",
@@ -846,6 +900,8 @@ const menuText = {
   },
   tr:{ cat_base:"Baz", cat_fillings:"İç Malzemeler", cat_veg:"Sebzeler", cat_sauces:"Soslar", cat_pita:"Özel Pita", cat_sweet_crepe:"Tatlı Krep", cat_pancake_waffle:"Pankek &amp; Waffle", cat_ice_cream:"Dondurma",
     cat_coffee_menu:"Kahve",
+    cat_top_healthy:"Sağlıklı", cat_top_normal:"Klasikler", cat_top_waffles:"Waffle", cat_top_crepes:"Krep", cat_top_drinks:"İçecekler", cat_top_icecream:"Dondurma",
+    cat_healthy_group:"Taze &amp; Hafif", cat_toppings:"Ekstralar", cat_crepe_base:"Krep (baz)",
     espresso_single:"Tekli Espresso", espresso_double:"Duble Espresso", cappuccino:"Cappuccino", freddo_espresso:"Freddo Espresso", freddo_cappuccino:"Freddo Cappuccino", americano:"Americano",
     pita_note:"Domuz eti şeritleri, domates, soğan, patates kızartması, marul, tzatziki.", scoop_note:"Fiyat top başınadır.",
     savory_crepe:"Tuzlu Krep (baz)", sandwich_base:"Sandviç (baz)",
@@ -875,11 +931,21 @@ function fmtPrice(v){
   return v.toFixed(2) + "€";
 }
 
+function renderCatalogTabs(lang){
+  const t = menuText[lang];
+  const catsEl = document.getElementById('catalogCats');
+  catsEl.innerHTML = catalogTopCats.map(c =>
+    '<button type="button" class="catalog-cat-btn' + (c.key === activeCatalogCat ? ' active' : '') + '" data-cat="' + c.key + '">'
+    + '<span class="cat-emoji">' + c.icon + '</span>' + t[c.labelKey] + '</button>'
+  ).join('');
+}
+
 function renderMenu(lang){
   const t = menuText[lang];
+  renderCatalogTabs(lang);
   const grid = document.getElementById('menuGrid');
   grid.innerHTML = "";
-  menuStructure.forEach(cat => {
+  menuStructure.filter(cat => cat.topCategory === activeCatalogCat).forEach(cat => {
     const card = document.createElement('div');
     card.className = "menu-card accent-" + cat.accent;
     let html = "<h3>" + cat.icon + " " + t[cat.key] + "</h3>";
@@ -895,6 +961,14 @@ function renderMenu(lang){
   });
   bindAddToCartButtons();
 }
+
+document.getElementById('catalogCats').addEventListener('click', (e) => {
+  const btn = e.target.closest('.catalog-cat-btn');
+  if(!btn) return;
+  activeCatalogCat = btn.getAttribute('data-cat');
+  safeSet('sc_catalog_cat', activeCatalogCat);
+  renderMenu(document.documentElement.lang || 'en');
+});
 
 /* ---------- Cart ---------- */
 function getCart(){
