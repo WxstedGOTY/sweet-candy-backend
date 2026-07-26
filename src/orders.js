@@ -48,15 +48,16 @@ function validateTip(tipEur) {
  */
 function computeTotals(cartItems, tipEur) {
   const { subtotal, lineItems } = computeSubtotal(cartItems);
+  const tip = validateTip(tipEur);
 
-  if (subtotal < MIN_ORDER_EUR) {
-    const err = new Error(`Minimum order is €${MIN_ORDER_EUR.toFixed(2)}. Current subtotal: €${subtotal.toFixed(2)}.`);
+  // Tip counts toward the minimum order (subtotal + tip must clear it).
+  if (round2(subtotal + tip) < MIN_ORDER_EUR) {
+    const err = new Error(`Minimum order is €${MIN_ORDER_EUR.toFixed(2)}. Current total (items + tip): €${(subtotal + tip).toFixed(2)}.`);
     err.code = 'BELOW_MINIMUM_ORDER';
     throw err;
   }
 
   const deliveryFee = subtotal >= FREE_DELIVERY_THRESHOLD_EUR ? 0 : DELIVERY_FEE_EUR;
-  const tip = validateTip(tipEur);
   const total = round2(subtotal + deliveryFee + tip);
 
   return { subtotal, deliveryFee, tip, total, lineItems };
