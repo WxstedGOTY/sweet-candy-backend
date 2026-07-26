@@ -133,21 +133,44 @@
 
   .catalog-wrap{max-width:1000px; margin:0 auto;}
   .catalog-intro{text-align:center; max-width:600px; margin:0 auto 40px;}
-  .catalog-cats{display:flex; justify-content:center; flex-wrap:wrap; gap:10px; max-width:820px; margin:0 auto 36px;}
-  .catalog-cat-btn{
-    background:var(--white); border:2px solid var(--gold); border-radius:999px; padding:11px 20px;
-    font-weight:800; font-size:0.92rem; cursor:pointer; color:var(--cocoa); display:inline-flex; align-items:center; gap:8px;
-    transition:background 0.15s ease, color 0.15s ease, transform 0.15s ease, border-color 0.15s ease;
-    box-shadow:0 4px 12px rgba(59,42,32,0.06);
+  .catalog-section-title{
+    font-family:'Fredoka', sans-serif; color:var(--sea-dark); font-size:1.15rem; font-weight:600;
+    margin:36px 0 16px; padding-bottom:8px; border-bottom:2px dashed #EAD9C4;
   }
-  .catalog-cat-btn .cat-emoji{font-size:1.05rem;}
-  .catalog-cat-btn:hover{transform:translateY(-2px); border-color:var(--cherry);}
-  .catalog-cat-btn.active{background:var(--cherry); border-color:var(--cherry); color:var(--white); box-shadow:0 8px 18px rgba(195,49,73,0.28);}
-  .catalog-group-title{
-    font-family:'Fredoka', sans-serif; color:var(--sea-dark); font-size:1.05rem; font-weight:600;
-    margin:26px 0 12px; padding-bottom:8px; border-bottom:2px dashed #EAD9C4; grid-column:1 / -1;
+  .catalog-section-title:first-child{margin-top:0;}
+  .product-tiles{display:grid; grid-template-columns:repeat(auto-fit, minmax(150px, 1fr)); gap:16px; margin-bottom:10px;}
+  .product-tile{
+    background:var(--white); border:2px solid #EAD9C4; border-radius:20px; padding:24px 16px; text-align:center;
+    cursor:pointer; transition:transform 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease;
+    box-shadow:0 6px 16px rgba(59,42,32,0.06);
   }
-  .catalog-group-title:first-of-type{margin-top:0;}
+  .product-tile:hover{transform:translateY(-3px); border-color:var(--gold); box-shadow:0 10px 22px rgba(59,42,32,0.12);}
+  .product-tile .tile-icon{font-size:2.3rem; display:block; margin-bottom:10px;}
+  .product-tile .tile-name{font-weight:800; color:var(--cocoa); font-size:1rem; display:block; margin-bottom:4px;}
+  .product-tile .tile-price{color:var(--sea-dark); font-weight:700; font-size:0.88rem;}
+  .customize-header{display:flex; align-items:center; gap:16px; margin-bottom:22px; flex-wrap:wrap;}
+  .customize-header h3{color:var(--cherry-dark); font-size:1.3rem;}
+  .back-btn{
+    background:var(--white); border:2px solid var(--gold); border-radius:999px; padding:9px 18px;
+    font-weight:800; cursor:pointer; color:var(--cocoa); font-size:0.9rem; transition:border-color 0.15s ease;
+  }
+  .back-btn:hover{border-color:var(--cherry);}
+  .customize-group-title{font-weight:800; color:var(--sea-dark); margin:20px 0 10px; font-size:0.95rem;}
+  .customize-group-title:first-child{margin-top:0;}
+  .extras-grid{display:flex; flex-wrap:wrap; gap:10px;}
+  .extra-btn{
+    background:var(--white); border:2px solid #EAD9C4; border-radius:999px; padding:10px 16px;
+    font-weight:700; font-size:0.88rem; cursor:pointer; color:var(--cocoa); display:inline-flex; gap:6px; align-items:center;
+    transition:background 0.15s ease, border-color 0.15s ease;
+  }
+  .extra-btn:hover{border-color:var(--gold);}
+  .extra-btn .extra-price{opacity:0.65; font-weight:600;}
+  .extra-btn.selected{background:var(--gold); border-color:var(--gold); color:var(--cocoa);}
+  .customize-footer{
+    position:sticky; bottom:0; background:var(--cream); padding:18px 0 4px; margin-top:26px; border-top:2px dashed #EAD9C4;
+    display:flex; align-items:center; justify-content:space-between; gap:16px; flex-wrap:wrap;
+  }
+  .customize-footer .running-total{font-weight:800; color:var(--cherry-dark); font-size:1.1rem;}
   .menu-grid{display:grid; grid-template-columns:1fr 1fr; gap:28px;}
   .menu-card{
     background:var(--white); border-radius:22px; padding:26px 24px; box-shadow:0 10px 26px rgba(59,42,32,0.08);
@@ -322,8 +345,31 @@
         <span class="section-label" data-i18n="catalog_label">Menu</span>
         <h2 data-i18n="catalog_h2">Our full price list.</h2>
       </div>
-      <div class="catalog-cats" id="catalogCats"></div>
-      <div class="menu-grid" id="menuGrid"></div>
+      <div id="catalogHome">
+        <div class="catalog-section-title" data-i18n="build_your_own">Build Your Own</div>
+        <div class="product-tiles" id="buildTiles"></div>
+
+        <div class="catalog-section-title" data-i18n="cat_pita">Pita Special</div>
+        <div class="menu-grid" id="pitaGrid"></div>
+
+        <div class="catalog-section-title" data-i18n="cat_coffee_menu">Coffee</div>
+        <div class="menu-grid" id="coffeeGrid"></div>
+
+        <div class="catalog-section-title" data-i18n="cat_ice_cream">Ice Cream</div>
+        <div class="menu-grid" id="iceGrid"></div>
+      </div>
+
+      <div id="customizeView" style="display:none;">
+        <div class="customize-header">
+          <button type="button" class="back-btn" id="customizeBack">← <span data-i18n="back_label">Back</span></button>
+          <h3 id="customizeTitle"></h3>
+        </div>
+        <div id="customizeGroups"></div>
+        <div class="customize-footer">
+          <span class="running-total" id="customizeTotal"></span>
+          <button type="button" class="btn btn-primary" id="customizeAddBtn" data-i18n="add_to_cart_label" style="margin-top:0; width:auto; padding:12px 28px;">Add to cart</button>
+        </div>
+      </div>
     </div>
   </section>
 </div>
@@ -728,45 +774,43 @@ const prices = {
   madagascar_bianca:2.45, lemon_sorbet:2.45, mango_sorbet:2.45, tiramisu:2.45, choco_brownies:2.45
 };
 
-const catalogTopCats = [
-  {key:"healthy", icon:"🥗", labelKey:"cat_top_healthy"},
-  {key:"normal", icon:"🥪", labelKey:"cat_top_normal"},
-  {key:"waffles", icon:"🧇", labelKey:"cat_top_waffles"},
-  {key:"crepes", icon:"🥞", labelKey:"cat_top_crepes"},
-  {key:"drinks", icon:"☕", labelKey:"cat_top_drinks"},
-  {key:"icecream", icon:"🍨", labelKey:"cat_top_icecream"}
+// "Build Your Own" bases: click one, then pick optional extras.
+const productBases = [
+  {id:"sandwich_base", icon:"🥪", extrasType:"savory"},
+  {id:"savory_crepe", icon:"🥙", extrasType:"savory"},
+  {id:"waffle", icon:"🧇", extrasType:"sweet"},
+  {id:"pancakes", icon:"🥞", extrasType:"sweet"},
+  {id:"sweet_crepe", icon:"🍫", extrasType:"sweet"}
 ];
 
-let activeCatalogCat = safeGet('sc_catalog_cat') || 'healthy';
+const extrasGroups = {
+  savory: [
+    {key:"cat_fillings", items:["edam","edam_grated","philadelphia","feta","ham","turkey","bacon","salami","frank_sausage","country_sausage","oregano_sausage","breaded_chicken","beef_pork_patty","chicken_breast","omelette","cheese_croquettes"]},
+    {key:"cat_veg", items:["tomato","green_pepper","mushrooms","onion","lettuce","corn","olives","boiled_egg"]},
+    {key:"cat_sauces", items:["tzatziki","bbq","pink_sauce","yellow_sauce","mayo","hungarian","spicy_cheese","mustard","ketchup"]}
+  ],
+  sweet: [
+    {key:"cat_toppings", items:["praline","white_choc","banana","walnut","coconut","almond","biscuit","oreo_biscuit","filled_biscuit","strawberry_jam","caprice"]}
+  ]
+};
 
-const menuStructure = [
-  {topCategory:"healthy", icon:"🥗", key:"cat_healthy_group", accent:"sea",
-    items:["feta","turkey","chicken_breast","tomato","green_pepper","mushrooms","onion","lettuce","corn","olives","boiled_egg","tzatziki"]},
-
-  {topCategory:"normal", icon:"🥙", key:"cat_base", accent:"cherry", items:["savory_crepe","sandwich_base","pita_special"], note:"pita_note"},
-  {topCategory:"normal", icon:"🧀", key:"cat_fillings", accent:"gold",
-    items:["edam","edam_grated","philadelphia","ham","bacon","salami","frank_sausage","country_sausage","oregano_sausage","breaded_chicken","beef_pork_patty","omelette","cheese_croquettes"]},
-  {topCategory:"normal", icon:"🥫", key:"cat_sauces", accent:"gold",
-    items:["bbq","pink_sauce","yellow_sauce","mayo","hungarian","spicy_cheese","mustard","ketchup"]},
-
-  {topCategory:"waffles", icon:"🧇", key:"cat_pancake_waffle", accent:"sea",
-    items:["waffle","pancakes","praline","white_choc","banana","walnut","coconut","almond","biscuit","oreo_biscuit","filled_biscuit","strawberry_jam","caprice"]},
-
-  {topCategory:"crepes", icon:"🥞", key:"cat_sweet_crepe", accent:"sea",
-    items:["sweet_crepe","praline","white_choc","banana","walnut","coconut","almond","biscuit","oreo_biscuit","filled_biscuit","strawberry_jam","caprice"]},
-
-  {topCategory:"drinks", icon:"☕", key:"cat_coffee_menu", accent:"gold",
-    items:["espresso_single","espresso_double","cappuccino","freddo_espresso","freddo_cappuccino","americano"]},
-
-  {topCategory:"icecream", icon:"🍨", key:"cat_ice_cream", accent:"cherry",
+// Simple, ready-as-is items — no customization, just add directly.
+const simpleGroups = [
+  {gridId:"pitaGrid", icon:"⭐", accent:"cherry", items:["pita_special"], note:"pita_note"},
+  {gridId:"coffeeGrid", icon:"☕", accent:"gold", items:["espresso_single","espresso_double","cappuccino","freddo_espresso","freddo_cappuccino","americano"]},
+  {gridId:"iceGrid", icon:"🍨", accent:"cherry",
     items:["chocolate","madagascar_vanilla","strawberry","vanilla_parfait","stracciatella","cookie_oreo","salted_caramel","triple_choc","ferrero","bueno","aegina_pistachio","kunefe","banoffee","cheesecake_amarena","red_velvet","yogurt_nuts_berries","dubai_choc","lotus","apple_strudel","madagascar_bianca","lemon_sorbet","mango_sorbet","tiramisu","choco_brownies"], note:"scoop_note"}
 ];
+
+let currentBase = null;
+let selectedExtras = new Set();
 
 const menuText = {
   en:{ cat_base:"To Start", cat_fillings:"Fillings", cat_veg:"Vegetables", cat_sauces:"Sauces", cat_pita:"Pita Special", cat_sweet_crepe:"Sweet Crepe", cat_pancake_waffle:"Pancakes &amp; Waffles", cat_ice_cream:"Ice Cream",
     cat_coffee_menu:"Coffee",
     cat_top_healthy:"Healthy", cat_top_normal:"Classics", cat_top_waffles:"Waffles", cat_top_crepes:"Crepes", cat_top_drinks:"Drinks", cat_top_icecream:"Ice Cream",
     cat_healthy_group:"Fresh &amp; Light", cat_toppings:"Toppings", cat_crepe_base:"Crepe (base)",
+    build_your_own:"Build Your Own", build_from:"From", total_label:"Total:", back_label:"Back", add_to_cart_label:"Add to cart",
     espresso_single:"Single Espresso", espresso_double:"Double Espresso", cappuccino:"Cappuccino", freddo_espresso:"Freddo Espresso", freddo_cappuccino:"Freddo Cappuccino", americano:"Americano",
     pita_note:"Pork strips, tomato, onion, fries, lettuce, tzatziki.", scoop_note:"Price per scoop.",
     savory_crepe:"Savory Crepe (base)", sandwich_base:"Sandwich (base)",
@@ -786,6 +830,7 @@ const menuText = {
     cat_coffee_menu:"Café",
     cat_top_healthy:"Sain", cat_top_normal:"Classiques", cat_top_waffles:"Gaufres", cat_top_crepes:"Crêpes", cat_top_drinks:"Boissons", cat_top_icecream:"Glaces",
     cat_healthy_group:"Frais &amp; Léger", cat_toppings:"Garnitures", cat_crepe_base:"Crêpe (base)",
+    build_your_own:"Composez le Vôtre", build_from:"À partir de", total_label:"Total :", back_label:"Retour", add_to_cart_label:"Ajouter au panier",
     espresso_single:"Espresso simple", espresso_double:"Espresso double", cappuccino:"Cappuccino", freddo_espresso:"Freddo Espresso", freddo_cappuccino:"Freddo Cappuccino", americano:"Americano",
     pita_note:"Lanières de porc, tomate, oignon, frites, laitue, tzatziki.", scoop_note:"Prix par boule.",
     savory_crepe:"Crêpe Salée (base)", sandwich_base:"Sandwich (base)",
@@ -805,6 +850,7 @@ const menuText = {
     cat_coffee_menu:"Καφές",
     cat_top_healthy:"Υγιεινά", cat_top_normal:"Κλασικά", cat_top_waffles:"Βάφλες", cat_top_crepes:"Κρέπες", cat_top_drinks:"Ροφήματα", cat_top_icecream:"Παγωτό",
     cat_healthy_group:"Φρέσκο &amp; Ελαφρύ", cat_toppings:"Γαρνιτούρες", cat_crepe_base:"Κρέπα (βάση)",
+    build_your_own:"Φτιάξε το Δικό σου", build_from:"Από", total_label:"Σύνολο:", back_label:"Πίσω", add_to_cart_label:"Προσθήκη στο καλάθι",
     espresso_single:"Espresso μόνος", espresso_double:"Espresso διπλός", cappuccino:"Καπουτσίνο", freddo_espresso:"Freddo Espresso", freddo_cappuccino:"Freddo Cappuccino", americano:"Αμερικάνο",
     pita_note:"Πανσετάκι χοιρινό, ντομάτα, κρεμμύδι, πατάτες, μαρούλι, τζατζίκι.", scoop_note:"Τιμή ανά μπάλα.",
     savory_crepe:"Κρέπα Αλμυρή (βάση)", sandwich_base:"Σάντουιτς (βάση)",
@@ -824,6 +870,7 @@ const menuText = {
     cat_coffee_menu:"Kaffee",
     cat_top_healthy:"Gesund", cat_top_normal:"Klassiker", cat_top_waffles:"Waffeln", cat_top_crepes:"Crêpes", cat_top_drinks:"Getränke", cat_top_icecream:"Eis",
     cat_healthy_group:"Frisch &amp; Leicht", cat_toppings:"Beläge", cat_crepe_base:"Crêpe (Basis)",
+    build_your_own:"Stell Dir Deins Zusammen", build_from:"Ab", total_label:"Gesamt:", back_label:"Zurück", add_to_cart_label:"In den Warenkorb",
     espresso_single:"Espresso einfach", espresso_double:"Espresso doppelt", cappuccino:"Cappuccino", freddo_espresso:"Freddo Espresso", freddo_cappuccino:"Freddo Cappuccino", americano:"Americano",
     pita_note:"Schweinestreifen, Tomate, Zwiebel, Pommes, Salat, Tzatziki.", scoop_note:"Preis pro Kugel.",
     savory_crepe:"Herzhafte Crêpe (Basis)", sandwich_base:"Sandwich (Basis)",
@@ -843,6 +890,7 @@ const menuText = {
     cat_coffee_menu:"Caffè",
     cat_top_healthy:"Salutare", cat_top_normal:"Classici", cat_top_waffles:"Waffel", cat_top_crepes:"Crêpe", cat_top_drinks:"Bevande", cat_top_icecream:"Gelato",
     cat_healthy_group:"Fresco &amp; Leggero", cat_toppings:"Farciture", cat_crepe_base:"Crêpe (base)",
+    build_your_own:"Componi il Tuo", build_from:"Da", total_label:"Totale:", back_label:"Indietro", add_to_cart_label:"Aggiungi al carrello",
     espresso_single:"Espresso singolo", espresso_double:"Espresso doppio", cappuccino:"Cappuccino", freddo_espresso:"Freddo Espresso", freddo_cappuccino:"Freddo Cappuccino", americano:"Americano",
     pita_note:"Strisce di maiale, pomodoro, cipolla, patatine, lattuga, tzatziki.", scoop_note:"Prezzo a pallina.",
     savory_crepe:"Crêpe Salata (base)", sandwich_base:"Panino (base)",
@@ -862,6 +910,7 @@ const menuText = {
     cat_coffee_menu:"Café",
     cat_top_healthy:"Saludable", cat_top_normal:"Clásicos", cat_top_waffles:"Gofres", cat_top_crepes:"Crepes", cat_top_drinks:"Bebidas", cat_top_icecream:"Helado",
     cat_healthy_group:"Fresco &amp; Ligero", cat_toppings:"Coberturas", cat_crepe_base:"Crepe (base)",
+    build_your_own:"Crea el Tuyo", build_from:"Desde", total_label:"Total:", back_label:"Volver", add_to_cart_label:"Añadir al carrito",
     espresso_single:"Espresso solo", espresso_double:"Espresso doble", cappuccino:"Capuchino", freddo_espresso:"Freddo Espresso", freddo_cappuccino:"Freddo Cappuccino", americano:"Americano",
     pita_note:"Tiras de cerdo, tomate, cebolla, patatas fritas, lechuga, tzatziki.", scoop_note:"Precio por bola.",
     savory_crepe:"Crepe Salado (base)", sandwich_base:"Sándwich (base)",
@@ -881,6 +930,7 @@ const menuText = {
     cat_coffee_menu:"Kawa",
     cat_top_healthy:"Zdrowe", cat_top_normal:"Klasyki", cat_top_waffles:"Gofry", cat_top_crepes:"Naleśniki", cat_top_drinks:"Napoje", cat_top_icecream:"Lody",
     cat_healthy_group:"Świeże &amp; Lekkie", cat_toppings:"Dodatki", cat_crepe_base:"Naleśnik (baza)",
+    build_your_own:"Stwórz Swoje", build_from:"Od", total_label:"Razem:", back_label:"Wstecz", add_to_cart_label:"Dodaj do koszyka",
     espresso_single:"Espresso pojedyncze", espresso_double:"Espresso podwójne", cappuccino:"Cappuccino", freddo_espresso:"Freddo Espresso", freddo_cappuccino:"Freddo Cappuccino", americano:"Americano",
     pita_note:"Paski wieprzowiny, pomidor, cebula, frytki, sałata, tzatziki.", scoop_note:"Cena za gałkę.",
     savory_crepe:"Naleśnik Wytrawny (podstawa)", sandwich_base:"Kanapka (podstawa)",
@@ -900,6 +950,7 @@ const menuText = {
     cat_coffee_menu:"Kahve",
     cat_top_healthy:"Sağlıklı", cat_top_normal:"Klasikler", cat_top_waffles:"Waffle", cat_top_crepes:"Krep", cat_top_drinks:"İçecekler", cat_top_icecream:"Dondurma",
     cat_healthy_group:"Taze &amp; Hafif", cat_toppings:"Ekstralar", cat_crepe_base:"Krep (baz)",
+    build_your_own:"Kendi Siparişini Oluştur", build_from:"Başlangıç", total_label:"Toplam:", back_label:"Geri", add_to_cart_label:"Sepete ekle",
     espresso_single:"Tekli Espresso", espresso_double:"Duble Espresso", cappuccino:"Cappuccino", freddo_espresso:"Freddo Espresso", freddo_cappuccino:"Freddo Cappuccino", americano:"Americano",
     pita_note:"Domuz eti şeritleri, domates, soğan, patates kızartması, marul, tzatziki.", scoop_note:"Fiyat top başınadır.",
     savory_crepe:"Tuzlu Krep (baz)", sandwich_base:"Sandviç (baz)",
@@ -929,43 +980,101 @@ function fmtPrice(v){
   return v.toFixed(2) + "€";
 }
 
-function renderCatalogTabs(lang){
+function renderProductTiles(lang){
   const t = menuText[lang];
-  const catsEl = document.getElementById('catalogCats');
-  catsEl.innerHTML = catalogTopCats.map(c =>
-    '<button type="button" class="catalog-cat-btn' + (c.key === activeCatalogCat ? ' active' : '') + '" data-cat="' + c.key + '">'
-    + '<span class="cat-emoji">' + c.icon + '</span>' + t[c.labelKey] + '</button>'
+  const el = document.getElementById('buildTiles');
+  el.innerHTML = productBases.map(p =>
+    '<div class="product-tile" data-base="' + p.id + '">'
+    + '<span class="tile-icon">' + p.icon + '</span>'
+    + '<span class="tile-name">' + t[p.id] + '</span>'
+    + '<span class="tile-price">' + t.build_from + ' ' + fmtPrice(prices[p.id]) + '</span>'
+    + '</div>'
   ).join('');
 }
 
-function renderMenu(lang){
+function renderSimpleGroups(lang){
   const t = menuText[lang];
-  renderCatalogTabs(lang);
-  const grid = document.getElementById('menuGrid');
-  grid.innerHTML = "";
-  menuStructure.filter(cat => cat.topCategory === activeCatalogCat).forEach(cat => {
+  simpleGroups.forEach(g => {
+    const grid = document.getElementById(g.gridId);
+    grid.innerHTML = "";
     const card = document.createElement('div');
-    card.className = "menu-card accent-" + cat.accent;
-    let html = "<h3>" + cat.icon + " " + t[cat.key] + "</h3>";
-    cat.items.forEach(itemKey => {
+    card.className = "menu-card accent-" + g.accent;
+    let html = "";
+    g.items.forEach(itemKey => {
       html += '<div class="menu-item"><span class="item-name">' + t[itemKey] + '</span><span class="item-dots"></span><span class="item-price">' + fmtPrice(prices[itemKey]) + '</span>'
         + '<button class="add-to-cart-btn" data-id="' + itemKey + '" data-name="' + t[itemKey].replace(/"/g,'&quot;') + '" data-price="' + prices[itemKey] + '" aria-label="Add">+</button></div>';
     });
-    if(cat.note){
-      html += '<div class="menu-note">' + t[cat.note] + '</div>';
+    if(g.note){
+      html += '<div class="menu-note">' + t[g.note] + '</div>';
     }
     card.innerHTML = html;
     grid.appendChild(card);
   });
+}
+
+function updateCustomizeTotal(lang){
+  const t = menuText[lang];
+  let total = prices[currentBase];
+  selectedExtras.forEach(id => { total += prices[id]; });
+  document.getElementById('customizeTotal').textContent = t.total_label + ' ' + fmtPrice(total);
+}
+
+function openCustomize(baseId, lang){
+  const t = menuText[lang];
+  const base = productBases.find(p => p.id === baseId);
+  if(!base) return;
+  currentBase = baseId;
+  selectedExtras = new Set();
+  document.getElementById('catalogHome').style.display = 'none';
+  document.getElementById('customizeView').style.display = 'block';
+  document.getElementById('customizeTitle').textContent = base.icon + ' ' + t[baseId];
+  const groupsEl = document.getElementById('customizeGroups');
+  groupsEl.innerHTML = extrasGroups[base.extrasType].map(g =>
+    '<div class="customize-group-title">' + t[g.key] + '</div><div class="extras-grid">'
+    + g.items.map(itemKey =>
+        '<button type="button" class="extra-btn" data-id="' + itemKey + '">' + t[itemKey]
+        + ' <span class="extra-price">+' + fmtPrice(prices[itemKey]) + '</span></button>'
+      ).join('')
+    + '</div>'
+  ).join('');
+  updateCustomizeTotal(lang);
+}
+
+function closeCustomize(){
+  document.getElementById('customizeView').style.display = 'none';
+  document.getElementById('catalogHome').style.display = 'block';
+}
+
+function renderMenu(lang){
+  renderProductTiles(lang);
+  renderSimpleGroups(lang);
+  closeCustomize();
   bindAddToCartButtons();
 }
 
-document.getElementById('catalogCats').addEventListener('click', (e) => {
-  const btn = e.target.closest('.catalog-cat-btn');
+document.getElementById('buildTiles').addEventListener('click', (e) => {
+  const tile = e.target.closest('.product-tile');
+  if(!tile) return;
+  openCustomize(tile.getAttribute('data-base'), document.documentElement.lang || 'en');
+});
+
+document.getElementById('customizeGroups').addEventListener('click', (e) => {
+  const btn = e.target.closest('.extra-btn');
   if(!btn) return;
-  activeCatalogCat = btn.getAttribute('data-cat');
-  safeSet('sc_catalog_cat', activeCatalogCat);
-  renderMenu(document.documentElement.lang || 'en');
+  const id = btn.getAttribute('data-id');
+  if(selectedExtras.has(id)){ selectedExtras.delete(id); btn.classList.remove('selected'); }
+  else { selectedExtras.add(id); btn.classList.add('selected'); }
+  updateCustomizeTotal(document.documentElement.lang || 'en');
+});
+
+document.getElementById('customizeBack').addEventListener('click', closeCustomize);
+
+document.getElementById('customizeAddBtn').addEventListener('click', () => {
+  const lang = document.documentElement.lang || 'en';
+  const t = menuText[lang];
+  addToCart(currentBase, t[currentBase], prices[currentBase]);
+  selectedExtras.forEach(id => addToCart(id, t[id], prices[id]));
+  closeCustomize();
 });
 
 /* ---------- Cart ---------- */
