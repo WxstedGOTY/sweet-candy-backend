@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Track Your Order | Sweet Candy</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@600;700&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{ --cream:#FBF3E7; --cherry:#C33149; --cherry-dark:#9E2436; --sea:#2A6F77; --gold:#E7A33E; --cocoa:#3B2A20; }
+  *{box-sizing:border-box; margin:0; padding:0;}
+  body{font-family:'Nunito',sans-serif; background:var(--cream); color:var(--cocoa); padding:40px 6%;}
+  .wrap{max-width:480px; margin:0 auto;}
+  h1{font-family:'Fredoka',sans-serif; color:var(--cherry-dark); font-size:1.5rem; margin-bottom:20px; text-align:center;}
+  .card{background:#fff; border-radius:18px; padding:26px; box-shadow:0 10px 24px rgba(59,42,32,0.08);}
+  .step{display:flex; align-items:center; gap:12px; padding:10px 0; opacity:0.4;}
+  .step.done{opacity:1;}
+  .step.current{opacity:1; font-weight:800; color:var(--cherry-dark);}
+  .step .dot{width:12px; height:12px; border-radius:50%; background:#ccc; flex-shrink:0;}
+  .step.done .dot, .step.current .dot{background:var(--sea);}
+  .step.current .dot{background:var(--gold);}
+  .meta{color:#8a7460; font-size:0.85rem; margin-top:18px; text-align:center;}
+  .err{color:var(--cherry-dark); text-align:center; font-weight:700;}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>Order Tracking</h1>
+  <div class="card" id="content">Loading…</div>
+</div>
+<script>
+const STEP_ORDER = ['order_received','preparing','ready_for_delivery','out_for_delivery','delivered'];
+
+async function load() {
+  const token = new URLSearchParams(window.location.search).get('token');
+  const content = document.getElementById('content');
+  if (!token) { content.innerHTML = '<p class="err">Missing tracking link.</p>'; return; }
+
+  try {
+    const res = await fetch(`/api/track/${encodeURIComponent(token)}`);
+    const data = await res.json();
+    if (!res.ok) { content.innerHTML = `<p class="err">${data.error || 'Order not found.'}</p>`; return; }
+
+    if (['cancelled','refunded','payment_failed','payment_pending'].includes(data.status)) {
+      content.innerHTML = `<p style="text-align:center; font-weight:800;">${data.statusLabel}</p>`;
+      return;
+    }
+
+    const currentIdx = STEP_ORDER.indexOf(data.status);
+    const stepsHtml = STEP_ORDER.map((s, i) => {
+      const label = { order_received:'Order received', preparing:'Preparing', ready_for_delivery:'Ready for delivery', out_for_delivery:'Out for delivery', delivered:'Delivered' }[s];
+      const cls = i < currentIdx ? 'done' : (i === currentIdx ? 'current' : '');
+      return `<div class="step ${cls}"><span class="dot"></span><span>${label}</span></div>`;
+    }).join('');
+
+    content.innerHTML = `
+      ${stepsHtml}
+      <div class="meta">Order ${data.orderId} · ${data.itemCount} item(s) · €${data.total.toFixed(2)}</div>
+    `;
+  } catch (err) {
+    content.innerHTML = '<p class="err">Could not load your order. Please try again.</p>';
+  }
+}
+load();
+setInterval(load, 20000);
+</script>
+</body>
+</html>

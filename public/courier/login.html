@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Courier Login | Sweet Candy</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@600;700&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{ --cream:#FBF3E7; --cherry:#C33149; --cherry-dark:#9E2436; --cocoa:#3B2A20; --gold:#E7A33E; --sea:#2A6F77; }
+  *{box-sizing:border-box; margin:0; padding:0;}
+  body{font-family:'Nunito',sans-serif; background:var(--sea); color:#fff; min-height:100vh; display:flex; align-items:center; justify-content:center;}
+  .card{background:#fff; color:var(--cocoa); border-radius:18px; padding:36px 30px; width:320px; box-shadow:0 20px 40px rgba(0,0,0,0.25);}
+  h1{font-family:'Fredoka',sans-serif; color:var(--cherry-dark); font-size:1.3rem; margin-bottom:20px; text-align:center;}
+  label{display:block; font-weight:700; font-size:0.85rem; margin:12px 0 6px;}
+  input{width:100%; padding:10px 12px; border:2px solid #EAD9C4; border-radius:10px; font-family:inherit; background:var(--cream);}
+  input:focus{outline:none; border-color:var(--gold);}
+  button{width:100%; margin-top:20px; padding:13px; border:none; border-radius:999px; background:var(--sea); color:#fff; font-weight:800; cursor:pointer;}
+  .err{color:var(--cherry-dark); font-size:0.85rem; margin-top:10px; text-align:center; display:none;}
+</style>
+</head>
+<body>
+<div class="card">
+  <h1>Sweet Candy — Courier</h1>
+  <label for="u">Username</label>
+  <input id="u" type="text" autocomplete="username">
+  <label for="p">Password</label>
+  <input id="p" type="password" autocomplete="current-password">
+  <button id="btn">Log in</button>
+  <p class="err" id="err"></p>
+</div>
+<script>
+document.getElementById('btn').addEventListener('click', async () => {
+  const username = document.getElementById('u').value.trim();
+  const password = document.getElementById('p').value;
+  const err = document.getElementById('err');
+  try {
+    const res = await fetch('/api/courier/login', {
+      method: 'POST', headers: {'Content-Type':'application/json'}, credentials: 'include',
+      body: JSON.stringify({ username, password })
+    });
+    const data = await res.json();
+    if (!res.ok) { err.textContent = data.error || 'Login failed.'; err.style.display='block'; return; }
+    window.location.href = 'dashboard.html';
+  } catch (e) {
+    err.textContent = 'Could not reach server.'; err.style.display = 'block';
+  }
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Checkout | Sweet Candy</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@600;700&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{ --cream:#FBF3E7; --cherry:#C33149; --cherry-dark:#9E2438; --sea:#2A6F77; --sea-dark:#1E5158; --gold:#E7A33E; --cocoa:#3B2A20; --white:#fff; }
+  *{box-sizing:border-box; margin:0; padding:0;}
+  body{font-family:'Nunito',sans-serif; background:var(--cream); color:var(--cocoa); line-height:1.6;}
+  a{color:var(--sea);}
+  header{background:var(--cocoa); color:#E8DCCB; padding:20px 6%; display:flex; justify-content:space-between; align-items:center;}
+  header .brand{font-family:'Fredoka',sans-serif; font-size:1.3rem; color:var(--gold);}
+  header a.back{color:#E8DCCB; font-weight:700; font-size:0.9rem;}
+  .wrap{max-width:640px; margin:0 auto; padding:36px 6% 100px;}
+  h1{font-family:'Fredoka',sans-serif; color:var(--cherry-dark); font-size:1.6rem; margin-bottom:20px;}
+  h2{font-family:'Fredoka',sans-serif; color:var(--sea); font-size:1.1rem; margin:28px 0 12px;}
+  .card{background:var(--white); border-radius:16px; padding:20px; box-shadow:0 8px 20px rgba(59,42,32,0.08); margin-bottom:20px;}
+  .cart-line{display:flex; justify-content:space-between; padding:8px 0; border-bottom:1px solid #F0E4D3; font-size:0.95rem;}
+  .cart-line:last-child{border-bottom:none;}
+  .totals-row{display:flex; justify-content:space-between; padding:6px 0; font-weight:700;}
+  .totals-row.grand{font-size:1.15rem; color:var(--cherry-dark); border-top:2px dashed #EAD9C4; margin-top:8px; padding-top:12px;}
+  label{display:block; font-weight:700; font-size:0.88rem; margin:14px 0 6px;}
+  input, textarea{
+    width:100%; padding:11px 13px; border:2px solid #EAD9C4; border-radius:10px; font-family:inherit;
+    font-size:0.95rem; background:var(--cream); color:var(--cocoa);
+  }
+  input:focus, textarea:focus{outline:none; border-color:var(--gold);}
+  textarea{resize:vertical; min-height:60px;}
+  .tip-row{display:flex; gap:10px; flex-wrap:wrap; margin-top:8px;}
+  .tip-btn{
+    background:var(--white); border:2px solid #EAD9C4; border-radius:999px; padding:9px 18px;
+    font-weight:800; cursor:pointer; font-size:0.9rem; color:var(--cocoa);
+  }
+  .tip-btn.selected{background:var(--gold); border-color:var(--gold); color:var(--cocoa);}
+  .tip-custom{width:100px; margin-top:0;}
+  .btn{
+    display:block; width:100%; padding:15px; border-radius:999px; font-weight:800; font-size:1.05rem;
+    border:none; cursor:pointer; margin-top:24px; transition:background 0.15s ease, opacity 0.15s ease;
+  }
+  .btn-primary{background:var(--cherry); color:var(--white);}
+  .btn-primary:hover{background:var(--cherry-dark);}
+  .btn-primary:disabled{opacity:0.5; cursor:not-allowed;}
+  .status-msg{
+    padding:12px 14px; border-radius:10px; font-size:0.9rem; font-weight:700; margin-top:14px; display:none;
+  }
+  .status-msg.error{background:#FBEAEA; color:var(--cherry-dark); border:1px solid #F2C4C9; display:block;}
+  .status-msg.success{background:#EAF6EE; color:#1F7A3E; border:1px solid #BCE3C8; display:block;}
+  .status-msg.info{background:#EFF6F5; color:var(--sea-dark); border:1px solid #C9E4E2; display:block;}
+  .empty-cart{text-align:center; color:#8a7460; padding:40px 0;}
+  .empty-cart a{font-weight:800;}
+  .distance-note{font-size:0.85rem; color:#6f8f92; margin-top:6px;}
+  .spinner{display:inline-block; width:16px; height:16px; border:2px solid rgba(255,255,255,0.4); border-top-color:#fff; border-radius:50%; animation:spin 0.7s linear infinite; vertical-align:middle; margin-right:8px;}
+  @keyframes spin{to{transform:rotate(360deg);}}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="brand">Sweet Candy</div>
+  <a class="back" href="index.html">← Back to menu</a>
+</header>
+
+<div class="wrap">
+  <h1>Checkout</h1>
+
+  <div id="emptyCartMsg" class="empty-cart" style="display:none;">
+    <p>Your cart is empty.</p>
+    <p><a href="index.html">Go back to the menu to add items</a></p>
+  </div>
+
+  <div id="checkoutContent">
+    <div class="card">
+      <div id="cartLines"></div>
+      <div class="totals-row"><span>Subtotal</span><span id="subtotalDisplay">€0.00</span></div>
+      <div class="totals-row"><span>Delivery fee</span><span id="deliveryFeeDisplay">—</span></div>
+      <div class="totals-row"><span>Courier tip</span><span id="tipDisplay">€0.00</span></div>
+      <div class="totals-row grand"><span>Total</span><span id="totalDisplay">€0.00</span></div>
+      <p class="distance-note" id="minOrderNote"></p>
+    </div>
+
+    <h2>Courier tip (optional)</h2>
+    <div class="card">
+      <div class="tip-row" id="tipButtons">
+        <button type="button" class="tip-btn selected" data-tip="0">No tip</button>
+        <button type="button" class="tip-btn" data-tip="1">€1</button>
+        <button type="button" class="tip-btn" data-tip="2">€2</button>
+        <button type="button" class="tip-btn" data-tip="5">€5</button>
+      </div>
+      <label for="customTip" style="margin-top:14px;">Or enter a custom amount (€)</label>
+      <input type="number" id="customTip" class="tip-custom" min="0" step="0.5" placeholder="0.00">
+    </div>
+
+    <h2>Delivery details</h2>
+    <div class="card">
+      <label for="custName">Full name</label>
+      <input type="text" id="custName" autocomplete="name">
+
+      <label for="custPhone">Phone number</label>
+      <input type="tel" id="custPhone" autocomplete="tel" placeholder="+30 ...">
+
+      <label for="custEmail">Email</label>
+      <input type="email" id="custEmail" autocomplete="email">
+
+      <label for="custAddress">Full delivery address (street &amp; number)</label>
+      <input type="text" id="custAddress" autocomplete="street-address" placeholder="e.g. Ermou 12">
+
+      <label for="custCity">City / Area</label>
+      <input type="text" id="custCity" autocomplete="address-level2" placeholder="e.g. Rio, Patra">
+
+      <label for="custPostal">Postal code</label>
+      <input type="text" id="custPostal" autocomplete="postal-code">
+
+      <label for="custBuilding">Apartment / building / floor (optional)</label>
+      <input type="text" id="custBuilding" placeholder="e.g. 2nd floor, buzzer B">
+
+      <label for="custInstructions">Delivery instructions (optional)</label>
+      <textarea id="custInstructions" placeholder="e.g. ring the bell twice, leave with concierge..."></textarea>
+
+      <div id="checkoutStatusMsg" class="status-msg"></div>
+
+      <button class="btn btn-primary" id="checkAddressBtn" type="button">Check delivery availability</button>
+      <button class="btn btn-primary" id="payBtn" type="button" style="display:none; background:var(--sea);">Continue to payment</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const API_BASE = window.SWEET_CANDY_API_BASE || ''; // same-origin by default; set window.SWEET_CANDY_API_BASE if the API is on a different domain
+
+function getCart() {
+  try { return JSON.parse(localStorage.getItem('sc_cart') || '[]'); } catch (e) { return []; }
+}
+
+function eur(n) { return '€' + Number(n).toFixed(2); }
+
+const cart = getCart();
+let selectedTip = 0;
+let lastValidatedAddress = null;
+let addressConfirmed = false;
+
+function renderCart() {
+  const linesEl = document.getElementById('cartLines');
+  if (!cart.length) {
+    document.getElementById('emptyCartMsg').style.display = 'block';
+    document.getElementById('checkoutContent').style.display = 'none';
+    return;
+  }
+  linesEl.innerHTML = cart.map(item =>
+    `<div class="cart-line"><span>${item.qty} × ${item.name}</span><span>${eur(item.unitPrice * item.qty)}</span></div>`
+  ).join('');
+  updateTotalsPreview();
+}
+
+function localSubtotal() {
+  return cart.reduce((sum, i) => sum + i.unitPrice * i.qty, 0);
+}
+
+function updateTotalsPreview() {
+  const subtotal = localSubtotal();
+  document.getElementById('subtotalDisplay').textContent = eur(subtotal);
+  document.getElementById('tipDisplay').textContent = eur(selectedTip);
+  const minNote = document.getElementById('minOrderNote');
+  if (subtotal < 10) {
+    minNote.textContent = `Minimum order is €10.00 — add €${(10 - subtotal).toFixed(2)} more to check out.`;
+  } else {
+    minNote.textContent = '';
+  }
+  // Delivery fee and grand total are only known for certain after the
+  // server confirms the address is within range (free delivery depends
+  // on the trusted subtotal too) — shown as "—" until then.
+}
+
+document.querySelectorAll('.tip-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.tip-btn').forEach(b => b.classList.remove('selected'));
+    btn.classList.add('selected');
+    selectedTip = parseFloat(btn.dataset.tip);
+    document.getElementById('customTip').value = '';
+    updateTotalsPreview();
+    resetAddressConfirmation();
+  });
+});
+document.getElementById('customTip').addEventListener('input', (e) => {
+  document.querySelectorAll('.tip-btn').forEach(b => b.classList.remove('selected'));
+  selectedTip = parseFloat(e.target.value) || 0;
+  updateTotalsPreview();
+  resetAddressConfirmation();
+});
+
+function resetAddressConfirmation() {
+  addressConfirmed = false;
+  document.getElementById('payBtn').style.display = 'none';
+  document.getElementById('checkAddressBtn').style.display = 'block';
+}
+
+function showStatus(type, message) {
+  const el = document.getElementById('checkoutStatusMsg');
+  el.className = 'status-msg ' + type;
+  el.textContent = message;
+}
+
+function buildFullAddress() {
+  const parts = [
+    document.getElementById('custAddress').value.trim(),
+    document.getElementById('custCity').value.trim(),
+    document.getElementById('custPostal').value.trim(),
+    'Greece'
+  ].filter(Boolean);
+  return parts.join(', ');
+}
+
+document.getElementById('checkAddressBtn').addEventListener('click', async () => {
+  const subtotal = localSubtotal();
+  if (subtotal < 10) {
+    showStatus('error', 'Minimum order is €10.00. Please add more items to your cart.');
+    return;
+  }
+  const name = document.getElementById('custName').value.trim();
+  const phone = document.getElementById('custPhone').value.trim();
+  const email = document.getElementById('custEmail').value.trim();
+  const address = buildFullAddress();
+
+  if (!name || !phone || !email || !document.getElementById('custAddress').value.trim()) {
+    showStatus('error', 'Please fill in your name, phone, email, and address first.');
+    return;
+  }
+
+  const btn = document.getElementById('checkAddressBtn');
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spinner"></span> Checking address…';
+  showStatus('info', 'Checking your address is within our delivery area…');
+
+  try {
+    const res = await fetch(API_BASE + '/api/checkout/quote', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ cart: cart.map(i => ({ id: i.id, qty: i.qty })), tip: selectedTip, address })
+    });
+    const data = await res.json();
+    btn.disabled = false;
+    btn.textContent = 'Check delivery availability';
+
+    if (!res.ok) {
+      showStatus('error', data.error || 'That address is not available for delivery.');
+      resetAddressConfirmation();
+      return;
+    }
+
+    document.getElementById('deliveryFeeDisplay').textContent = data.deliveryFee === 0 ? 'Free' : eur(data.deliveryFee);
+    document.getElementById('totalDisplay').textContent = eur(data.total);
+    showStatus('success', `Deliverable — about ${data.distance.distanceText}, ~${data.distance.durationText} by road. You're all set to continue.`);
+
+    lastValidatedAddress = address;
+    addressConfirmed = true;
+    document.getElementById('checkAddressBtn').style.display = 'none';
+    document.getElementById('payBtn').style.display = 'block';
+  } catch (err) {
+    btn.disabled = false;
+    btn.textContent = 'Check delivery availability';
+    showStatus('error', 'Something went wrong checking your address. Please try again.');
+  }
+});
+
+// If the customer edits any field after confirming, require re-checking
+// the address before payment (since something they entered may affect
+// the calculated distance/total).
+['custName','custPhone','custEmail','custAddress','custCity','custPostal'].forEach(id => {
+  document.getElementById(id).addEventListener('input', () => {
+    if (addressConfirmed) resetAddressConfirmation();
+  });
+});
+
+document.getElementById('payBtn').addEventListener('click', async () => {
+  const btn = document.getElementById('payBtn');
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spinner"></span> Redirecting to payment…';
+  showStatus('info', 'Redirecting you to secure payment…');
+
+  const customer = {
+    name: document.getElementById('custName').value.trim(),
+    phone: document.getElementById('custPhone').value.trim(),
+    email: document.getElementById('custEmail').value.trim(),
+    address: buildFullAddress(),
+    city: document.getElementById('custCity').value.trim(),
+    postalCode: document.getElementById('custPostal').value.trim(),
+    buildingDetails: document.getElementById('custBuilding').value.trim(),
+    deliveryInstructions: document.getElementById('custInstructions').value.trim()
+  };
+
+  try {
+    const res = await fetch(API_BASE + '/api/checkout/create-session', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ cart: cart.map(i => ({ id: i.id, qty: i.qty })), tip: selectedTip, customer })
+    });
+    const data = await res.json();
+    if (!res.ok) {
+      btn.disabled = false;
+      btn.textContent = 'Continue to payment';
+      showStatus('error', data.error || 'Could not start checkout. Please try again.');
+      return;
+    }
+    localStorage.setItem('sc_last_order', JSON.stringify({ orderId: data.orderId, trackingToken: data.trackingToken }));
+    window.location.href = data.checkoutUrl;
+  } catch (err) {
+    btn.disabled = false;
+    btn.textContent = 'Continue to payment';
+    showStatus('error', 'Something went wrong starting payment. Please try again.');
+  }
+});
+
+renderCart();
+</script>
+
+</body>
+</html>

@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin Dashboard | Sweet Candy</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@600;700&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{ --cream:#FBF3E7; --cherry:#C33149; --cherry-dark:#9E2436; --sea:#2A6F77; --gold:#E7A33E; --cocoa:#3B2A20; }
+  *{box-sizing:border-box; margin:0; padding:0;}
+  body{font-family:'Nunito',sans-serif; background:var(--cream); color:var(--cocoa);}
+  header{background:var(--cocoa); color:#fff; padding:16px 4%; display:flex; justify-content:space-between; align-items:center;}
+  header .brand{font-family:'Fredoka',sans-serif; color:var(--gold); font-size:1.2rem;}
+  header button{background:none; border:1px solid #E8DCCB; color:#E8DCCB; padding:6px 14px; border-radius:999px; cursor:pointer; font-weight:700;}
+  .wrap{max-width:1100px; margin:0 auto; padding:24px 4% 60px;}
+  .toolbar{display:flex; gap:10px; flex-wrap:wrap; margin-bottom:18px;}
+  .toolbar input, .toolbar select{padding:9px 12px; border:2px solid #EAD9C4; border-radius:10px; font-family:inherit; background:#fff;}
+  table{width:100%; border-collapse:collapse; background:#fff; border-radius:12px; overflow:hidden; box-shadow:0 6px 18px rgba(59,42,32,0.06);}
+  th, td{text-align:left; padding:10px 12px; font-size:0.85rem; border-bottom:1px solid #F0E4D3;}
+  th{background:#F7E9D3; color:var(--cherry-dark);}
+  select.status-select{padding:5px 8px; border-radius:6px; border:1px solid #ccc;}
+  .tag{padding:3px 9px; border-radius:999px; font-size:0.75rem; font-weight:800; background:#eee;}
+  .tag.paid{background:#EAF6EE; color:#1F7A3E;}
+  .tag.pending{background:#FFF6E0; color:#8a6a1f;}
+  .tag.failed, .tag.cancelled{background:#FBEAEA; color:var(--cherry-dark);}
+  button.small{padding:5px 10px; border-radius:8px; border:1px solid #ccc; background:#fff; cursor:pointer; font-size:0.78rem;}
+  .section-title{font-family:'Fredoka',sans-serif; color:var(--sea); margin:26px 0 10px;}
+</style>
+</head>
+<body>
+<header>
+  <div class="brand">Sweet Candy — Admin</div>
+  <button id="logoutBtn">Log out</button>
+</header>
+<div class="wrap">
+  <div class="toolbar">
+    <input type="text" id="searchInput" placeholder="Search by order ID, name, phone, email">
+    <select id="statusFilter">
+      <option value="">All statuses</option>
+      <option value="payment_pending">Payment pending</option>
+      <option value="order_received">Order received</option>
+      <option value="preparing">Preparing</option>
+      <option value="ready_for_delivery">Ready for delivery</option>
+      <option value="out_for_delivery">Out for delivery</option>
+      <option value="delivered">Delivered</option>
+      <option value="cancelled">Cancelled</option>
+      <option value="refunded">Refunded</option>
+      <option value="payment_failed">Payment failed</option>
+    </select>
+    <button class="small" id="refreshBtn">Refresh</button>
+  </div>
+
+  <table>
+    <thead>
+      <tr>
+        <th>Order</th><th>Customer</th><th>Total</th><th>Tip</th><th>Payment</th><th>Status</th><th>Courier</th><th></th>
+      </tr>
+    </thead>
+    <tbody id="ordersBody"></tbody>
+  </table>
+
+  <h2 class="section-title">Courier tips owed</h2>
+  <table>
+    <thead><tr><th>Courier</th><th>Delivered orders</th><th>Total tips</th></tr></thead>
+    <tbody id="tipsBody"></tbody>
+  </table>
+</div>
+
+<script>
+const STATUS_ORDER = ['payment_pending','order_received','preparing','ready_for_delivery','out_for_delivery','delivered'];
+
+function escapeHtml(str) {
+  const div = document.createElement('div');
+  div.textContent = str ?? '';
+  return div.innerHTML;
+}
+
+async function api(path, opts = {}) {
+  const res = await fetch(path, { credentials: 'include', headers: {'Content-Type':'application/json'}, ...opts });
+  if (res.status === 401 || res.status === 403) { window.location.href = 'login.html'; throw new Error('unauthorized'); }
+  const data = await res.json();
+  if (!res.ok) throw new Error(data.error || 'Request failed');
+  return data;
+}
+
+let couriers = [];
+
+async function loadCouriers() {
+  const data = await api('/api/admin/couriers');
+  couriers = data.couriers;
+}
+
+function statusOptionsHtml(current) {
+  return STATUS_ORDER.map(s => `<option value="${s}" ${s===current?'selected':''}>${s.replace(/_/g,' ')}</option>`).join('')
+    + `<option value="cancelled" ${current==='cancelled'?'selected':''}>cancelled</option>`
+    + `<option value="refunded" ${current==='refunded'?'selected':''}>refunded</option>`;
+}
+
+function courierOptionsHtml(current) {
+  return '<option value="">— unassigned —</option>' +
+    couriers.map(c => `<option value="${c.id}" ${c.id===current?'selected':''}>${escapeHtml(c.name)}</option>`).join('');
+}
+
+async function loadOrders() {
+  const search = document.getElementById('searchInput').value.trim();
+  const status = document.getElementById('statusFilter').value;
+  const params = new URLSearchParams();
+  if (search) params.set('search', search);
+  if (status) params.set('status', status);
+
+  const data = await api('/api/admin/orders?' + params.toString());
+  const tbody = document.getElementById('ordersBody');
+  tbody.innerHTML = data.orders.map(o => `
+    <tr>
+      <td>${escapeHtml(o.id)}<br><small>${new Date(o.createdAt).toLocaleString()}</small></td>
+      <td>${escapeHtml(o.customer.name)}<br><small>${escapeHtml(o.customer.phone)}</small></td>
+      <td>€${o.total.toFixed(2)}</td>
+      <td>€${o.tip.toFixed(2)}</td>
+      <td><span class="tag ${o.paymentStatus}">${escapeHtml(o.paymentStatus)}</span></td>
+      <td>
+        <select class="status-select" data-order="${o.id}">
+          ${statusOptionsHtml(o.status)}
+        </select>
+      </td>
+      <td>
+        <select class="courier-select" data-order="${o.id}">
+          ${courierOptionsHtml(o.courierId)}
+        </select>
+      </td>
+      <td>
+        ${o.paymentStatus === 'paid' ? `<button class="small refund-btn" data-order="${o.id}">Refund</button>` : ''}
+      </td>
+    </tr>
+  `).join('');
+
+  tbody.querySelectorAll('.status-select').forEach(sel => {
+    sel.addEventListener('change', async () => {
+      try {
+        await api(`/api/admin/orders/${sel.dataset.order}/status`, { method: 'PATCH', body: JSON.stringify({ status: sel.value }) });
+        loadOrders();
+      } catch (e) { alert(e.message); loadOrders(); }
+    });
+  });
+  tbody.querySelectorAll('.courier-select').forEach(sel => {
+    sel.addEventListener('change', async () => {
+      try {
+        await api(`/api/admin/orders/${sel.dataset.order}/assign-courier`, { method: 'PATCH', body: JSON.stringify({ courierId: sel.value }) });
+        loadOrders();
+      } catch (e) { alert(e.message); loadOrders(); }
+    });
+  });
+  tbody.querySelectorAll('.refund-btn').forEach(btn => {
+    btn.addEventListener('click', async () => {
+      if (!confirm('Issue a full refund for this order?')) return;
+      try {
+        await api(`/api/admin/orders/${btn.dataset.order}/refund`, { method: 'POST' });
+        loadOrders();
+      } catch (e) { alert(e.message); }
+    });
+  });
+}
+
+async function loadTips() {
+  const data = await api('/api/admin/tips-report');
+  document.getElementById('tipsBody').innerHTML = data.report.map(r => `
+    <tr><td>${escapeHtml(r.courierName)}</td><td>${r.deliveredOrders}</td><td>€${r.totalTips.toFixed(2)}</td></tr>
+  `).join('') || '<tr><td colspan="3">No tips recorded yet.</td></tr>';
+}
+
+document.getElementById('refreshBtn').addEventListener('click', () => { loadOrders(); loadTips(); });
+document.getElementById('searchInput').addEventListener('keydown', (e) => { if (e.key === 'Enter') loadOrders(); });
+document.getElementById('statusFilter').addEventListener('change', loadOrders);
+document.getElementById('logoutBtn').addEventListener('click', async () => {
+  await api('/api/admin/logout', { method: 'POST' });
+  window.location.href = 'login.html';
+});
+
+(async () => {
+  try {
+    await loadCouriers();
+    await loadOrders();
+    await loadTips();
+  } catch (e) { /* redirected to login already if unauthorized */ }
+})();
+setInterval(() => { loadOrders(); loadTips(); }, 30000);
+</script>
+</body>
+</html>

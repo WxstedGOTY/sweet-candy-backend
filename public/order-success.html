@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Order Confirmed | Sweet Candy</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@600;700&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{ --cream:#FBF3E7; --cherry:#C33149; --cherry-dark:#9E2436; --sea:#2A6F77; --gold:#E7A33E; --cocoa:#3B2A20; }
+  *{box-sizing:border-box; margin:0; padding:0;}
+  body{font-family:'Nunito',sans-serif; background:var(--cream); color:var(--cocoa); min-height:100vh; display:flex; align-items:center; justify-content:center; text-align:center; padding:24px;}
+  .card{background:#fff; border-radius:20px; padding:44px 30px; max-width:420px; box-shadow:0 14px 34px rgba(59,42,32,0.12);}
+  .check{font-size:3rem; margin-bottom:10px;}
+  h1{font-family:'Fredoka',sans-serif; color:var(--cherry-dark); font-size:1.5rem; margin-bottom:10px;}
+  p{margin-bottom:18px; color:#5a4536;}
+  a.btn{
+    display:inline-block; background:var(--sea); color:#fff; padding:13px 26px; border-radius:999px;
+    font-weight:800; text-decoration:none; margin:6px;
+  }
+  a.btn.secondary{background:transparent; border:2px solid var(--gold); color:var(--cocoa);}
+</style>
+</head>
+<body>
+  <div class="card">
+    <div class="check">🍦</div>
+    <h1>Thank you — your order is on its way to us!</h1>
+    <p>We've received your payment and your order is being prepared. You can track its progress anytime with the link below.</p>
+    <a class="btn" id="trackLink" href="#">Track my order</a>
+    <a class="btn secondary" href="index.html">Back to site</a>
+  </div>
+<script>
+  const params = new URLSearchParams(window.location.search);
+  const order = params.get('order');
+  const token = params.get('token');
+  if (order && token) {
+    document.getElementById('trackLink').href = `track.html?token=${encodeURIComponent(token)}`;
+  }
+  localStorage.removeItem('sc_cart');
+</script>
+</body>
+</html>

@@ -1,0 +1,30 @@
+{
+  "name": "sweet-candy-backend",
+  "version": "1.0.0",
+  "description": "Order, payment, delivery-distance, and courier backend for Sweet Candy",
+  "main": "server.js",
+  "type": "commonjs",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node --watch server.js",
+    "create-admin": "node scripts/create-user.js admin",
+    "create-courier": "node scripts/create-user.js courier"
+  },
+  "dependencies": {
+    "express": "^4.19.2",
+    "stripe": "^16.8.0",
+    "dotenv": "^16.4.5",
+    "jsonwebtoken": "^9.0.2",
+    "bcryptjs": "^2.4.3",
+    "cors": "^2.8.5",
+    "helmet": "^7.1.0",
+    "express-rate-limit": "^7.4.0",
+    "cookie-parser": "^1.4.6",
+    "uuid": "^9.0.1",
+    "node-fetch": "^2.7.0",
+    "proper-lockfile": "^4.1.2"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}
