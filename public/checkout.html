@@ -162,15 +162,23 @@ function updateTotalsPreview() {
   const subtotal = localSubtotal();
   document.getElementById('subtotalDisplay').textContent = eur(subtotal);
   document.getElementById('tipDisplay').textContent = eur(selectedTip);
+
+  // Delivery fee is only known for certain after the server confirms the
+  // address is within range, but we can still show a running total
+  // (items + tip) immediately so the customer isn't looking at €0.00.
+  // It gets replaced with the exact total (incl. delivery fee) once the
+  // address check succeeds.
+  if (!addressConfirmed) {
+    document.getElementById('totalDisplay').textContent = eur(subtotal + selectedTip) + ' + delivery';
+  }
+
   const minNote = document.getElementById('minOrderNote');
-  if (subtotal < 10) {
-    minNote.textContent = `Minimum order is €10.00 — add €${(10 - subtotal).toFixed(2)} more to check out.`;
+  const orderValue = subtotal + selectedTip; // tip counts toward the minimum
+  if (orderValue < 10) {
+    minNote.textContent = `Minimum order is €10.00 (items + tip) — add €${(10 - orderValue).toFixed(2)} more to check out.`;
   } else {
     minNote.textContent = '';
   }
-  // Delivery fee and grand total are only known for certain after the
-  // server confirms the address is within range (free delivery depends
-  // on the trusted subtotal too) — shown as "—" until then.
 }
 
 document.querySelectorAll('.tip-btn').forEach(btn => {
@@ -194,6 +202,8 @@ function resetAddressConfirmation() {
   addressConfirmed = false;
   document.getElementById('payBtn').style.display = 'none';
   document.getElementById('checkAddressBtn').style.display = 'block';
+  document.getElementById('deliveryFeeDisplay').textContent = '—';
+  updateTotalsPreview();
 }
 
 function showStatus(type, message) {
@@ -214,8 +224,8 @@ function buildFullAddress() {
 
 document.getElementById('checkAddressBtn').addEventListener('click', async () => {
   const subtotal = localSubtotal();
-  if (subtotal < 10) {
-    showStatus('error', 'Minimum order is €10.00. Please add more items to your cart.');
+  if (subtotal + selectedTip < 10) {
+    showStatus('error', 'Minimum order is €10.00 (items + tip). Please add more items or increase your tip.');
     return;
   }
   const name = document.getElementById('custName').value.trim();
