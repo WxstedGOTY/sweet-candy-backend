@@ -148,6 +148,8 @@
   .product-tile .tile-icon{font-size:2.3rem; display:block; margin-bottom:10px;}
   .product-tile .tile-name{font-weight:800; color:var(--cocoa); font-size:1rem; display:block; margin-bottom:4px;}
   .product-tile .tile-price{color:var(--sea-dark); font-weight:700; font-size:0.88rem;}
+  .product-tile .tile-note{display:block; margin-top:8px; font-size:0.76rem; color:#8a7460; font-style:italic; line-height:1.3;}
+  .product-tile.added{border-color:var(--cherry); box-shadow:0 0 0 3px rgba(195,49,73,0.22);}
   .customize-header{display:flex; align-items:center; gap:16px; margin-bottom:22px; flex-wrap:wrap;}
   .customize-header h3{color:var(--cherry-dark); font-size:1.3rem;}
   .back-btn{
@@ -349,14 +351,12 @@
         <div class="catalog-section-title" data-i18n="build_your_own">Build Your Own</div>
         <div class="product-tiles" id="buildTiles"></div>
 
-        <div class="catalog-section-title" data-i18n="cat_pita">Pita Special</div>
-        <div class="menu-grid" id="pitaGrid"></div>
-
         <div class="catalog-section-title" data-i18n="cat_coffee_menu">Coffee</div>
-        <div class="menu-grid" id="coffeeGrid"></div>
+        <div class="product-tiles" id="coffeeTiles"></div>
 
         <div class="catalog-section-title" data-i18n="cat_ice_cream">Ice Cream</div>
-        <div class="menu-grid" id="iceGrid"></div>
+        <p class="menu-note" id="iceNote" style="margin:-6px 0 14px;"></p>
+        <div class="product-tiles" id="iceTiles"></div>
       </div>
 
       <div id="customizeView" style="display:none;">
@@ -778,6 +778,7 @@ const prices = {
 const productBases = [
   {id:"sandwich_base", icon:"🥪", extrasType:"savory"},
   {id:"savory_crepe", icon:"🥙", extrasType:"savory"},
+  {id:"pita_special", icon:"⭐", extrasType:null, note:"pita_note"},
   {id:"waffle", icon:"🧇", extrasType:"sweet"},
   {id:"pancakes", icon:"🥞", extrasType:"sweet"},
   {id:"sweet_crepe", icon:"🍫", extrasType:"sweet"}
@@ -794,12 +795,11 @@ const extrasGroups = {
   ]
 };
 
-// Simple, ready-as-is items — no customization, just add directly.
-const simpleGroups = [
-  {gridId:"pitaGrid", icon:"⭐", accent:"cherry", items:["pita_special"], note:"pita_note"},
-  {gridId:"coffeeGrid", icon:"☕", accent:"gold", items:["espresso_single","espresso_double","cappuccino","freddo_espresso","freddo_cappuccino","americano"]},
-  {gridId:"iceGrid", icon:"🍨", accent:"cherry",
-    items:["chocolate","madagascar_vanilla","strawberry","vanilla_parfait","stracciatella","cookie_oreo","salted_caramel","triple_choc","ferrero","bueno","aegina_pistachio","kunefe","banoffee","cheesecake_amarena","red_velvet","yogurt_nuts_berries","dubai_choc","lotus","apple_strudel","madagascar_bianca","lemon_sorbet","mango_sorbet","tiramisu","choco_brownies"], note:"scoop_note"}
+// Simple, ready-as-is items — no customization, shown as tiles that add directly.
+const directGroups = [
+  {gridId:"coffeeTiles", icon:"☕", items:["espresso_single","espresso_double","cappuccino","freddo_espresso","freddo_cappuccino","americano"]},
+  {gridId:"iceTiles", icon:"🍨", noteEl:"iceNote", note:"scoop_note",
+    items:["chocolate","madagascar_vanilla","strawberry","vanilla_parfait","stracciatella","cookie_oreo","salted_caramel","triple_choc","ferrero","bueno","aegina_pistachio","kunefe","banoffee","cheesecake_amarena","red_velvet","yogurt_nuts_berries","dubai_choc","lotus","apple_strudel","madagascar_bianca","lemon_sorbet","mango_sorbet","tiramisu","choco_brownies"]}
 ];
 
 let currentBase = null;
@@ -987,28 +987,26 @@ function renderProductTiles(lang){
     '<div class="product-tile" data-base="' + p.id + '">'
     + '<span class="tile-icon">' + p.icon + '</span>'
     + '<span class="tile-name">' + t[p.id] + '</span>'
-    + '<span class="tile-price">' + t.build_from + ' ' + fmtPrice(prices[p.id]) + '</span>'
+    + '<span class="tile-price">' + (p.extrasType ? t.build_from + ' ' : '') + fmtPrice(prices[p.id]) + '</span>'
+    + (p.note ? '<span class="tile-note">' + t[p.note] + '</span>' : '')
     + '</div>'
   ).join('');
 }
 
-function renderSimpleGroups(lang){
+function renderDirectGroups(lang){
   const t = menuText[lang];
-  simpleGroups.forEach(g => {
-    const grid = document.getElementById(g.gridId);
-    grid.innerHTML = "";
-    const card = document.createElement('div');
-    card.className = "menu-card accent-" + g.accent;
-    let html = "";
-    g.items.forEach(itemKey => {
-      html += '<div class="menu-item"><span class="item-name">' + t[itemKey] + '</span><span class="item-dots"></span><span class="item-price">' + fmtPrice(prices[itemKey]) + '</span>'
-        + '<button class="add-to-cart-btn" data-id="' + itemKey + '" data-name="' + t[itemKey].replace(/"/g,'&quot;') + '" data-price="' + prices[itemKey] + '" aria-label="Add">+</button></div>';
-    });
-    if(g.note){
-      html += '<div class="menu-note">' + t[g.note] + '</div>';
+  directGroups.forEach(g => {
+    const el = document.getElementById(g.gridId);
+    el.innerHTML = g.items.map(itemKey =>
+      '<div class="product-tile" data-item="' + itemKey + '">'
+      + '<span class="tile-icon">' + g.icon + '</span>'
+      + '<span class="tile-name">' + t[itemKey] + '</span>'
+      + '<span class="tile-price">' + fmtPrice(prices[itemKey]) + '</span>'
+      + '</div>'
+    ).join('');
+    if(g.noteEl && g.note){
+      document.getElementById(g.noteEl).textContent = t[g.note];
     }
-    card.innerHTML = html;
-    grid.appendChild(card);
   });
 }
 
@@ -1045,17 +1043,42 @@ function closeCustomize(){
   document.getElementById('catalogHome').style.display = 'block';
 }
 
+function flashTileAdded(tile){
+  tile.classList.add('added');
+  setTimeout(() => tile.classList.remove('added'), 300);
+}
+
 function renderMenu(lang){
   renderProductTiles(lang);
-  renderSimpleGroups(lang);
+  renderDirectGroups(lang);
   closeCustomize();
-  bindAddToCartButtons();
 }
 
 document.getElementById('buildTiles').addEventListener('click', (e) => {
   const tile = e.target.closest('.product-tile');
   if(!tile) return;
-  openCustomize(tile.getAttribute('data-base'), document.documentElement.lang || 'en');
+  const lang = document.documentElement.lang || 'en';
+  const baseId = tile.getAttribute('data-base');
+  const base = productBases.find(p => p.id === baseId);
+  if(base && base.extrasType){
+    openCustomize(baseId, lang);
+  } else {
+    const t = menuText[lang];
+    addToCart(baseId, t[baseId], prices[baseId]);
+    flashTileAdded(tile);
+  }
+});
+
+['coffeeTiles','iceTiles'].forEach(gridId => {
+  document.getElementById(gridId).addEventListener('click', (e) => {
+    const tile = e.target.closest('.product-tile');
+    if(!tile) return;
+    const lang = document.documentElement.lang || 'en';
+    const t = menuText[lang];
+    const itemKey = tile.getAttribute('data-item');
+    addToCart(itemKey, t[itemKey], prices[itemKey]);
+    flashTileAdded(tile);
+  });
 });
 
 document.getElementById('customizeGroups').addEventListener('click', (e) => {
