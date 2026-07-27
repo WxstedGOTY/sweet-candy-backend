@@ -64,6 +64,9 @@
     position:absolute; background-image:url('donut.png');
     background-size:contain; background-repeat:no-repeat; aspect-ratio:1/1;
   }
+  /* decorative donuts live in the side margins; hidden on narrow screens
+     where the content column fills the width and they would overlap it */
+  @media (max-width:1150px){ .home-donuts{display:none;} }
   .hero-brand, .rating-pill, .hero h1, .hero p.tagline, .cta-row{position:relative; z-index:1;}
   .hero-brand{font-size:clamp(2rem, 5vw, 2.6rem); color:var(--cherry-dark); margin-bottom:6px;}
   .hero-brand span{color:var(--sea);}
@@ -109,7 +112,7 @@
   .about-card li{padding:10px 0; border-bottom:1px solid rgba(255,255,255,0.15); font-weight:700; display:flex; justify-content:space-between;}
   .about-card li:last-child{border-bottom:none;}
 
-  .categories{background:var(--cream); padding-bottom:30px;}
+  .categories{background:var(--cream); padding-bottom:30px; position:relative;}
   .cat-header{position:relative; z-index:1; text-align:center; max-width:600px; margin:0 auto 24px;}
   .cat-toggle{
     background:var(--white); border:2px solid var(--gold); border-radius:999px;
@@ -131,7 +134,7 @@
   }
   .cat-row-icon{font-size:1.3rem;}
 
-  .gallery{background:#F7E9D3;}
+  .gallery{background:#F7E9D3; position:relative;}
   .gallery-header{position:relative; z-index:1; text-align:center; max-width:600px; margin:0 auto 36px;}
   .gallery-grid{position:relative; z-index:1; display:grid; grid-template-columns:1fr 1fr; gap:20px; max-width:900px; margin:0 auto;}
   .gallery-grid figure{border-radius:20px; overflow:hidden; box-shadow:0 12px 26px rgba(59,42,32,0.12); border:4px solid var(--white);}
@@ -281,103 +284,19 @@
 <div class="awning"></div>
 
 <div class="page active" id="page-home">
-  <div class="home-donuts" aria-hidden="true">
-    <span class="home-donut" style="top:0.2%; left:1.9%; width:64px; opacity:0.64; transform:rotate(-9deg);"></span>
-    <span class="home-donut" style="top:2.1%; left:17.0%; width:78px; opacity:0.56; transform:rotate(11deg);"></span>
-    <span class="home-donut" style="top:0.2%; left:30.8%; width:69px; opacity:0.78; transform:rotate(5deg);"></span>
-    <span class="home-donut" style="top:0.2%; left:51.0%; width:60px; opacity:0.78; transform:rotate(22deg);"></span>
-    <span class="home-donut" style="top:0.2%; left:68.2%; width:72px; opacity:0.68; transform:rotate(-20deg);"></span>
-    <span class="home-donut" style="top:2.0%; left:82.0%; width:53px; opacity:0.69; transform:rotate(1deg);"></span>
-    <span class="home-donut" style="top:7.9%; left:10.5%; width:51px; opacity:0.54; transform:rotate(-21deg);"></span>
-    <span class="home-donut" style="top:9.3%; left:25.8%; width:67px; opacity:0.62; transform:rotate(-13deg);"></span>
-    <span class="home-donut" style="top:8.5%; left:39.4%; width:61px; opacity:0.52; transform:rotate(-10deg);"></span>
-    <span class="home-donut" style="top:8.5%; left:60.2%; width:50px; opacity:0.54; transform:rotate(8deg);"></span>
-    <span class="home-donut" style="top:9.6%; left:73.4%; width:67px; opacity:0.78; transform:rotate(12deg);"></span>
-    <span class="home-donut" style="top:9.2%; left:89.5%; width:74px; opacity:0.65; transform:rotate(-2deg);"></span>
-    <span class="home-donut" style="top:20.0%; left:0.4%; width:47px; opacity:0.75; transform:rotate(-12deg);"></span>
-    <span class="home-donut" style="top:19.1%; left:19.6%; width:77px; opacity:0.5; transform:rotate(-18deg);"></span>
-    <span class="home-donut" style="top:18.6%; left:34.6%; width:60px; opacity:0.67; transform:rotate(-2deg);"></span>
-    <span class="home-donut" style="top:18.6%; left:50.1%; width:57px; opacity:0.7; transform:rotate(18deg);"></span>
-    <span class="home-donut" style="top:17.9%; left:67.8%; width:68px; opacity:0.73; transform:rotate(-3deg);"></span>
-    <span class="home-donut" style="top:17.6%; left:80.2%; width:57px; opacity:0.73; transform:rotate(1deg);"></span>
-    <span class="home-donut" style="top:26.3%; left:7.0%; width:61px; opacity:0.62; transform:rotate(-12deg);"></span>
-    <span class="home-donut" style="top:28.8%; left:26.0%; width:68px; opacity:0.65; transform:rotate(2deg);"></span>
-    <span class="home-donut" style="top:27.9%; left:43.8%; width:61px; opacity:0.55; transform:rotate(-18deg);"></span>
-    <span class="home-donut" style="top:27.2%; left:57.4%; width:76px; opacity:0.52; transform:rotate(-4deg);"></span>
-    <span class="home-donut" style="top:25.9%; left:72.8%; width:64px; opacity:0.51; transform:rotate(-7deg);"></span>
-    <span class="home-donut" style="top:26.3%; left:88.0%; width:67px; opacity:0.69; transform:rotate(-13deg);"></span>
-    <span class="home-donut" style="top:37.9%; left:2.2%; width:76px; opacity:0.51; transform:rotate(-14deg);"></span>
-    <span class="home-donut" style="top:37.8%; left:17.3%; width:76px; opacity:0.51; transform:rotate(-9deg);"></span>
-    <span class="home-donut" style="top:37.6%; left:32.7%; width:55px; opacity:0.76; transform:rotate(16deg);"></span>
-    <span class="home-donut" style="top:37.2%; left:49.4%; width:76px; opacity:0.59; transform:rotate(12deg);"></span>
-    <span class="home-donut" style="top:36.6%; left:63.9%; width:46px; opacity:0.61; transform:rotate(-14deg);"></span>
-    <span class="home-donut" style="top:37.8%; left:79.5%; width:66px; opacity:0.69; transform:rotate(15deg);"></span>
-    <span class="home-donut" style="top:45.0%; left:10.2%; width:54px; opacity:0.54; transform:rotate(-16deg);"></span>
-    <span class="home-donut" style="top:44.9%; left:23.9%; width:74px; opacity:0.74; transform:rotate(-18deg);"></span>
-    <span class="home-donut" style="top:46.4%; left:42.4%; width:54px; opacity:0.59; transform:rotate(-2deg);"></span>
-    <span class="home-donut" style="top:44.9%; left:59.8%; width:56px; opacity:0.55; transform:rotate(2deg);"></span>
-    <span class="home-donut" style="top:44.3%; left:75.2%; width:48px; opacity:0.68; transform:rotate(10deg);"></span>
-    <span class="home-donut" style="top:46.5%; left:91.5%; width:46px; opacity:0.62; transform:rotate(-18deg);"></span>
-    <span class="home-donut" style="top:53.9%; left:1.3%; width:60px; opacity:0.58; transform:rotate(22deg);"></span>
-    <span class="home-donut" style="top:54.6%; left:18.4%; width:61px; opacity:0.62; transform:rotate(-3deg);"></span>
-    <span class="home-donut" style="top:55.0%; left:35.8%; width:78px; opacity:0.74; transform:rotate(9deg);"></span>
-    <span class="home-donut" style="top:55.7%; left:47.5%; width:49px; opacity:0.65; transform:rotate(-2deg);"></span>
-    <span class="home-donut" style="top:55.7%; left:64.7%; width:58px; opacity:0.52; transform:rotate(-2deg);"></span>
-    <span class="home-donut" style="top:55.8%; left:81.1%; width:66px; opacity:0.7; transform:rotate(4deg);"></span>
-    <span class="home-donut" style="top:61.9%; left:7.2%; width:50px; opacity:0.69; transform:rotate(6deg);"></span>
-    <span class="home-donut" style="top:63.2%; left:27.7%; width:74px; opacity:0.64; transform:rotate(10deg);"></span>
-    <span class="home-donut" style="top:62.8%; left:41.2%; width:60px; opacity:0.51; transform:rotate(20deg);"></span>
-    <span class="home-donut" style="top:63.0%; left:56.6%; width:71px; opacity:0.72; transform:rotate(7deg);"></span>
-    <span class="home-donut" style="top:64.1%; left:73.5%; width:66px; opacity:0.65; transform:rotate(18deg);"></span>
-    <span class="home-donut" style="top:64.5%; left:90.9%; width:48px; opacity:0.64; transform:rotate(9deg);"></span>
-    <span class="home-donut" style="top:71.7%; left:1.5%; width:59px; opacity:0.73; transform:rotate(18deg);"></span>
-    <span class="home-donut" style="top:72.6%; left:17.8%; width:62px; opacity:0.57; transform:rotate(9deg);"></span>
-    <span class="home-donut" style="top:71.8%; left:33.9%; width:46px; opacity:0.55; transform:rotate(-10deg);"></span>
-    <span class="home-donut" style="top:71.5%; left:49.0%; width:55px; opacity:0.53; transform:rotate(-11deg);"></span>
-    <span class="home-donut" style="top:70.8%; left:64.7%; width:70px; opacity:0.72; transform:rotate(7deg);"></span>
-    <span class="home-donut" style="top:73.7%; left:84.3%; width:56px; opacity:0.71; transform:rotate(-9deg);"></span>
-    <span class="home-donut" style="top:81.7%; left:8.7%; width:58px; opacity:0.58; transform:rotate(-21deg);"></span>
-    <span class="home-donut" style="top:80.5%; left:24.3%; width:55px; opacity:0.77; transform:rotate(10deg);"></span>
-    <span class="home-donut" style="top:80.1%; left:42.2%; width:63px; opacity:0.71; transform:rotate(-12deg);"></span>
-    <span class="home-donut" style="top:82.5%; left:57.7%; width:73px; opacity:0.64; transform:rotate(20deg);"></span>
-    <span class="home-donut" style="top:80.4%; left:72.4%; width:70px; opacity:0.69; transform:rotate(-16deg);"></span>
-    <span class="home-donut" style="top:80.1%; left:92.5%; width:48px; opacity:0.61; transform:rotate(18deg);"></span>
-    <span class="home-donut" style="top:91.4%; left:2.0%; width:47px; opacity:0.52; transform:rotate(15deg);"></span>
-    <span class="home-donut" style="top:88.6%; left:17.7%; width:74px; opacity:0.57; transform:rotate(-22deg);"></span>
-    <span class="home-donut" style="top:91.5%; left:31.6%; width:65px; opacity:0.56; transform:rotate(1deg);"></span>
-    <span class="home-donut" style="top:91.3%; left:48.9%; width:54px; opacity:0.67; transform:rotate(5deg);"></span>
-    <span class="home-donut" style="top:90.1%; left:63.4%; width:58px; opacity:0.63; transform:rotate(13deg);"></span>
-    <span class="home-donut" style="top:89.2%; left:82.2%; width:75px; opacity:0.77; transform:rotate(-21deg);"></span>
-    <span class="home-donut" style="top:99.2%; left:7.2%; width:73px; opacity:0.77; transform:rotate(20deg);"></span>
-    <span class="home-donut" style="top:98.0%; left:23.3%; width:77px; opacity:0.64; transform:rotate(21deg);"></span>
-    <span class="home-donut" style="top:98.5%; left:40.5%; width:68px; opacity:0.59; transform:rotate(18deg);"></span>
-    <span class="home-donut" style="top:99.2%; left:59.8%; width:50px; opacity:0.7; transform:rotate(-11deg);"></span>
-    <span class="home-donut" style="top:99.0%; left:74.9%; width:58px; opacity:0.61; transform:rotate(0deg);"></span>
-    <span class="home-donut" style="top:97.6%; left:87.9%; width:77px; opacity:0.58; transform:rotate(19deg);"></span>
-  </div>
 
   <section class="hero">
     <div class="home-donuts" aria-hidden="true">
-      <span class="home-donut" style="top:3.7%; left:0.2%; width:51px; opacity:0.78; transform:rotate(12deg);"></span>
-      <span class="home-donut" style="top:3.2%; left:18.9%; width:50px; opacity:0.72; transform:rotate(11deg);"></span>
-      <span class="home-donut" style="top:3.8%; left:38.9%; width:51px; opacity:0.56; transform:rotate(-20deg);"></span>
-      <span class="home-donut" style="top:4.7%; left:59.7%; width:64px; opacity:0.69; transform:rotate(-11deg);"></span>
-      <span class="home-donut" style="top:2.5%; left:77.9%; width:59px; opacity:0.55; transform:rotate(6deg);"></span>
-      <span class="home-donut" style="top:33.0%; left:13.0%; width:65px; opacity:0.52; transform:rotate(21deg);"></span>
-      <span class="home-donut" style="top:32.9%; left:32.4%; width:61px; opacity:0.68; transform:rotate(-15deg);"></span>
-      <span class="home-donut" style="top:33.5%; left:49.3%; width:58px; opacity:0.78; transform:rotate(1deg);"></span>
-      <span class="home-donut" style="top:30.4%; left:68.5%; width:63px; opacity:0.58; transform:rotate(-21deg);"></span>
-      <span class="home-donut" style="top:32.8%; left:89.3%; width:49px; opacity:0.55; transform:rotate(12deg);"></span>
-      <span class="home-donut" style="top:60.0%; left:0.6%; width:51px; opacity:0.8; transform:rotate(13deg);"></span>
-      <span class="home-donut" style="top:59.3%; left:20.1%; width:68px; opacity:0.76; transform:rotate(1deg);"></span>
-      <span class="home-donut" style="top:61.3%; left:38.5%; width:63px; opacity:0.55; transform:rotate(12deg);"></span>
-      <span class="home-donut" style="top:60.5%; left:61.0%; width:62px; opacity:0.54; transform:rotate(-21deg);"></span>
-      <span class="home-donut" style="top:61.3%; left:80.9%; width:68px; opacity:0.51; transform:rotate(20deg);"></span>
-      <span class="home-donut" style="top:88.8%; left:12.2%; width:50px; opacity:0.78; transform:rotate(11deg);"></span>
-      <span class="home-donut" style="top:87.6%; left:32.9%; width:53px; opacity:0.54; transform:rotate(-7deg);"></span>
-      <span class="home-donut" style="top:88.5%; left:50.4%; width:58px; opacity:0.73; transform:rotate(-10deg);"></span>
-      <span class="home-donut" style="top:88.5%; left:68.0%; width:57px; opacity:0.75; transform:rotate(-8deg);"></span>
-      <span class="home-donut" style="top:88.0%; left:87.4%; width:61px; opacity:0.76; transform:rotate(-9deg);"></span>
+      <span class="home-donut" style="top:2%; left:2%; width:67px; opacity:0.59; transform:rotate(2deg);"></span>
+      <span class="home-donut" style="top:10%; left:10%; width:70px; opacity:0.77; transform:rotate(13deg);"></span>
+      <span class="home-donut" style="top:2%; left:86%; width:48px; opacity:0.74; transform:rotate(-5deg);"></span>
+      <span class="home-donut" style="top:11%; left:92%; width:68px; opacity:0.53; transform:rotate(-10deg);"></span>
+      <span class="home-donut" style="top:88%; left:3%; width:51px; opacity:0.62; transform:rotate(-5deg);"></span>
+      <span class="home-donut" style="top:93%; left:15%; width:60px; opacity:0.66; transform:rotate(16deg);"></span>
+      <span class="home-donut" style="top:90%; left:28%; width:55px; opacity:0.52; transform:rotate(-7deg);"></span>
+      <span class="home-donut" style="top:90%; left:70%; width:61px; opacity:0.59; transform:rotate(4deg);"></span>
+      <span class="home-donut" style="top:93%; left:83%; width:53px; opacity:0.72; transform:rotate(-16deg);"></span>
+      <span class="home-donut" style="top:87%; left:91%; width:52px; opacity:0.68; transform:rotate(8deg);"></span>
     </div>
     <div class="hero-brand">Sweet<span>Candy</span></div>
     <a class="rating-pill" href="https://www.google.com/maps/search/?api=1&query=Sweet+Candy+Posidonos+25+Patra" target="_blank" rel="noopener" data-i18n="rating_pill">⭐ 5.0 Stars — See our reviews on Google</a>
@@ -410,6 +329,18 @@
   </section>
 
   <section class="categories" id="categories">
+    <div class="home-donuts" aria-hidden="true">
+    <span class="home-donut" style="top:10%; left:2%; width:52px; opacity:0.55; transform:rotate(-20deg);"></span>
+    <span class="home-donut" style="top:27%; left:11%; width:54px; opacity:0.72; transform:rotate(-10deg);"></span>
+    <span class="home-donut" style="top:46%; left:3%; width:53px; opacity:0.6; transform:rotate(-8deg);"></span>
+    <span class="home-donut" style="top:63%; left:12%; width:65px; opacity:0.75; transform:rotate(20deg);"></span>
+    <span class="home-donut" style="top:81%; left:2%; width:54px; opacity:0.57; transform:rotate(-8deg);"></span>
+    <span class="home-donut" style="top:8%; left:86%; width:60px; opacity:0.6; transform:rotate(3deg);"></span>
+    <span class="home-donut" style="top:26%; left:92%; width:61px; opacity:0.56; transform:rotate(-11deg);"></span>
+    <span class="home-donut" style="top:45%; left:84%; width:56px; opacity:0.54; transform:rotate(-1deg);"></span>
+    <span class="home-donut" style="top:64%; left:91%; width:67px; opacity:0.67; transform:rotate(18deg);"></span>
+    <span class="home-donut" style="top:82%; left:85%; width:69px; opacity:0.7; transform:rotate(-16deg);"></span>
+    </div>
     <div class="cat-header">
       <button class="cat-toggle" id="catToggle" aria-expanded="false">
         <span class="section-label" data-i18n="cat_label" style="margin-bottom:0;">What we serve</span>
@@ -427,6 +358,20 @@
   </section>
 
   <section class="gallery" id="gallery">
+    <div class="home-donuts" aria-hidden="true">
+    <span class="home-donut" style="top:8%; left:2%; width:57px; opacity:0.61; transform:rotate(-1deg);"></span>
+    <span class="home-donut" style="top:22%; left:10%; width:63px; opacity:0.7; transform:rotate(-9deg);"></span>
+    <span class="home-donut" style="top:38%; left:3%; width:63px; opacity:0.64; transform:rotate(-9deg);"></span>
+    <span class="home-donut" style="top:55%; left:11%; width:49px; opacity:0.59; transform:rotate(-19deg);"></span>
+    <span class="home-donut" style="top:71%; left:2%; width:71px; opacity:0.61; transform:rotate(5deg);"></span>
+    <span class="home-donut" style="top:87%; left:9%; width:48px; opacity:0.66; transform:rotate(6deg);"></span>
+    <span class="home-donut" style="top:6%; left:87%; width:59px; opacity:0.62; transform:rotate(-20deg);"></span>
+    <span class="home-donut" style="top:21%; left:93%; width:62px; opacity:0.53; transform:rotate(-9deg);"></span>
+    <span class="home-donut" style="top:37%; left:85%; width:67px; opacity:0.77; transform:rotate(-8deg);"></span>
+    <span class="home-donut" style="top:53%; left:92%; width:51px; opacity:0.72; transform:rotate(9deg);"></span>
+    <span class="home-donut" style="top:69%; left:86%; width:59px; opacity:0.65; transform:rotate(13deg);"></span>
+    <span class="home-donut" style="top:85%; left:93%; width:56px; opacity:0.72; transform:rotate(-14deg);"></span>
+    </div>
     <div class="gallery-header">
       <span class="section-label" data-i18n="gallery_label">Photos</span>
       <h2 data-i18n="gallery_h2">A few moments from here.</h2>
