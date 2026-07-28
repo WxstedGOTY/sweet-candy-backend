@@ -8,7 +8,7 @@ const fetch = require('node-fetch');
 
 const GOOGLE_MAPS_API_KEY = process.env.GOOGLE_MAPS_API_KEY;
 const STORE_ADDRESS = process.env.STORE_ADDRESS;
-const MAX_DELIVERY_DISTANCE_METERS = parseInt(process.env.MAX_DELIVERY_DISTANCE_METERS || '20000', 10);
+const MAX_DELIVERY_DISTANCE_METERS = parseInt(process.env.MAX_DELIVERY_DISTANCE_METERS || '6000', 10);
 
 /**
  * Checks the real driving distance from the store to a customer address.

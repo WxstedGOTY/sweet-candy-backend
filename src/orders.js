@@ -2,7 +2,7 @@ const crypto = require('crypto');
 const db = require('./db');
 const { computeSubtotal } = require('./products');
 
-const MIN_ORDER_EUR = parseFloat(process.env.MIN_ORDER_EUR || '10');
+const MIN_ORDER_EUR = parseFloat(process.env.MIN_ORDER_EUR || '7.5');
 const DELIVERY_FEE_EUR = parseFloat(process.env.DELIVERY_FEE_EUR || '1');
 const FREE_DELIVERY_THRESHOLD_EUR = parseFloat(process.env.FREE_DELIVERY_THRESHOLD_EUR || '25');
 
@@ -50,9 +50,9 @@ function computeTotals(cartItems, tipEur) {
   const { subtotal, lineItems } = computeSubtotal(cartItems);
   const tip = validateTip(tipEur);
 
-  // Tip counts toward the minimum order (subtotal + tip must clear it).
-  if (round2(subtotal + tip) < MIN_ORDER_EUR) {
-    const err = new Error(`Minimum order is €${MIN_ORDER_EUR.toFixed(2)}. Current total (items + tip): €${(subtotal + tip).toFixed(2)}.`);
+  // The tip does NOT count toward the minimum order: the items alone must clear it.
+  if (round2(subtotal) < MIN_ORDER_EUR) {
+    const err = new Error(`Minimum order is €${MIN_ORDER_EUR.toFixed(2)} (excluding tip and delivery). Current items total: €${subtotal.toFixed(2)}.`);
     err.code = 'BELOW_MINIMUM_ORDER';
     throw err;
   }

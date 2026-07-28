@@ -7,7 +7,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@600;700&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
 <style>
-  :root{ --cream:#FBF3E7; --cherry:#C33149; --cherry-dark:#9E2438; --sea:#2A6F77; --sea-dark:#1E5158; --gold:#E7A33E; --cocoa:#3B2A20; --white:#fff; }
+  :root{ --cream:#FBF3E7; --cherry:#C33149; --cherry-dark:#9E2438; --sea:#B04E5A; --sea-dark:#8E3B47; --gold:#E7A33E; --cocoa:#3B2A20; --white:#fff; }
   *{box-sizing:border-box; margin:0; padding:0;}
   body{font-family:'Nunito',sans-serif; background:var(--cream); color:var(--cocoa); line-height:1.6;}
   a{color:var(--sea);}
@@ -62,10 +62,10 @@
   }
   .status-msg.error{background:#FBEAEA; color:var(--cherry-dark); border:1px solid #F2C4C9; display:block;}
   .status-msg.success{background:#EAF6EE; color:#1F7A3E; border:1px solid #BCE3C8; display:block;}
-  .status-msg.info{background:#EFF6F5; color:var(--sea-dark); border:1px solid #C9E4E2; display:block;}
+  .status-msg.info{background:#FBF0F1; color:var(--sea-dark); border:1px solid #EBD2D6; display:block;}
   .empty-cart{text-align:center; color:#8a7460; padding:40px 0;}
   .empty-cart a{font-weight:800;}
-  .distance-note{font-size:0.85rem; color:#6f8f92; margin-top:6px;}
+  .distance-note{font-size:0.85rem; color:#9C8086; margin-top:6px;}
   .spinner{display:inline-block; width:16px; height:16px; border:2px solid rgba(255,255,255,0.4); border-top-color:#fff; border-radius:50%; animation:spin 0.7s linear infinite; vertical-align:middle; margin-right:8px;}
   @keyframes spin{to{transform:rotate(360deg);}}
 </style>
@@ -150,6 +150,10 @@ function getCart() {
 
 function eur(n) { return '€' + Number(n).toFixed(2); }
 
+// Display-only copy of the server's rule (src/orders.js is the source of truth):
+// items must reach this on their own — tip and delivery don't count toward it.
+const MIN_ORDER_EUR = 7.5;
+
 let cart = getCart();
 let selectedTip = 0;
 let lastValidatedAddress = null;
@@ -223,9 +227,9 @@ function updateTotalsPreview() {
   }
 
   const minNote = document.getElementById('minOrderNote');
-  const orderValue = subtotal + selectedTip; // tip counts toward the minimum
-  if (orderValue < 10) {
-    minNote.textContent = `Minimum order is €10.00 (items + tip) — add €${(10 - orderValue).toFixed(2)} more to check out.`;
+  // The tip does NOT count toward the minimum — items alone must reach it.
+  if (subtotal < MIN_ORDER_EUR) {
+    minNote.textContent = `Minimum order is €${MIN_ORDER_EUR.toFixed(2)} in items (tip not included) — add €${(MIN_ORDER_EUR - subtotal).toFixed(2)} more to check out.`;
   } else {
     minNote.textContent = '';
   }
@@ -274,8 +278,8 @@ function buildFullAddress() {
 
 document.getElementById('checkAddressBtn').addEventListener('click', async () => {
   const subtotal = localSubtotal();
-  if (subtotal + selectedTip < 10) {
-    showStatus('error', 'Minimum order is €10.00 (items + tip). Please add more items or increase your tip.');
+  if (subtotal < MIN_ORDER_EUR) {
+    showStatus('error', `Minimum order is €${MIN_ORDER_EUR.toFixed(2)} in items (the tip doesn't count toward it). Please add more items.`);
     return;
   }
   const name = document.getElementById('custName').value.trim();
